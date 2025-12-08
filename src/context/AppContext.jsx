@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext } from 'react';
+import { getCurrentUser, logout as authLogout } from '../services/authService';
 
 const AppContext = createContext();
 
@@ -13,18 +14,28 @@ export const AppProvider = ({ children }) => {
     const [userPlan, setUserPlan] = useState('free'); // 'free', 'standard', 'pro'
     const [theme, setTheme] = useState('light');
 
+    // Initialize user
+    React.useEffect(() => {
+        const currentUser = getCurrentUser();
+        if (currentUser) {
+            setIsLoggedIn(true);
+            setUser(currentUser.user);
+        }
+    }, []);
+
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
         document.documentElement.setAttribute('data-theme', newTheme);
     };
 
-    const login = (email) => {
+    const login = (userData) => {
         setIsLoggedIn(true);
-        setUser({ name: "John Doe", email: email || "john.doe@example.com" });
+        setUser(userData.user);
     };
 
     const logout = () => {
+        authLogout();
         setIsLoggedIn(false);
         setUser(null);
     };

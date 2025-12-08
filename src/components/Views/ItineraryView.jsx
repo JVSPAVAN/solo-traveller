@@ -308,7 +308,7 @@ const ItineraryView = ({ onOpenReservation, onOpenShare, onOpenInvite, onMarkerC
                                                                 onShowRoute([stop.lat, stop.lng], [nextStop.lat, nextStop.lng], stop.transit, polyline);
                                                             }
                                                         }}
-                                                        style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', background: '#f5f7f9', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', color: '#5f6368', margin: '10px 0' }}
+                                                        style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', background: 'var(--bg-hover)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', color: 'var(--text-light)', margin: '10px 0' }}
                                                         title="Show route on map"
                                                     >
                                                         <i className={`fa-solid ${stop.transit.toLowerCase().includes('walk') ? 'fa-person-walking' : 'fa-car-side'}`}></i>
@@ -352,8 +352,8 @@ const TransitDropdown = ({ stop, onModeSelect, onClose }) => {
                 position: 'absolute',
                 top: '100%',
                 left: '0',
-                background: 'white',
-                border: '1px solid #ddd',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
                 borderRadius: '8px',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                 zIndex: 1000,
@@ -367,7 +367,7 @@ const TransitDropdown = ({ stop, onModeSelect, onClose }) => {
             {stop.transitDetails?.driving && (
                 <div
                     onClick={(e) => { e.stopPropagation(); onModeSelect('driving'); }}
-                    style={{ padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', background: stop.selectedMode === 'driving' ? '#f0f7ff' : 'transparent' }}
+                    style={{ padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', background: stop.selectedMode === 'driving' ? 'var(--bg-hover)' : 'transparent' }}
                 >
                     <i className="fa-solid fa-car-side" style={{ width: '20px', textAlign: 'center' }}></i>
                     <div>
@@ -380,7 +380,7 @@ const TransitDropdown = ({ stop, onModeSelect, onClose }) => {
             {stop.transitDetails?.walking && (
                 <div
                     onClick={(e) => { e.stopPropagation(); onModeSelect('walking'); }}
-                    style={{ padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', background: stop.selectedMode === 'walking' ? '#f0f7ff' : 'transparent' }}
+                    style={{ padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', background: stop.selectedMode === 'walking' ? 'var(--bg-hover)' : 'transparent' }}
                 >
                     <i className="fa-solid fa-person-walking" style={{ width: '20px', textAlign: 'center' }}></i>
                     <div>

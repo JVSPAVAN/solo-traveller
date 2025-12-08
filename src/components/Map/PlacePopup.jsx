@@ -62,16 +62,16 @@ const PlacePopup = ({ stop, onNavigate }) => {
     return (
         <div className="map-popup-card">
             {/* Navigation Header */}
-            <div className="popup-nav-header" style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 15px', borderBottom: '1px solid #f0f0f0', alignItems: 'center' }}>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                    <button onClick={() => onNavigate('prev')} style={{ background: 'none', border: '1px solid #ddd', borderRadius: '4px', padding: '2px 8px', cursor: 'pointer', fontSize: '0.8rem' }} title="Previous">
+            <div className="popup-nav-header" style={{ display: 'flex', alignItems: 'center', padding: '10px 15px', borderBottom: '1px solid var(--border-color)' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <button onClick={() => onNavigate('prev')} style={{ background: 'none', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '4px 10px', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--text-main)' }} title="Previous">
                         <i className="fa-solid fa-chevron-left"></i>
                     </button>
-                    <button onClick={() => onNavigate('next')} style={{ background: 'none', border: '1px solid #ddd', borderRadius: '4px', padding: '2px 8px', cursor: 'pointer', fontSize: '0.8rem' }} title="Next">
+                    <button onClick={() => onNavigate('next')} style={{ background: 'none', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '4px 10px', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--text-main)' }} title="Next">
                         <i className="fa-solid fa-chevron-right"></i>
                     </button>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontWeight: 600, marginLeft: '5px' }}>{(stop.globalIndex !== undefined ? stop.globalIndex : 0) + 1} of {stop.totalStops}</span>
                 </div>
-                <span style={{ fontSize: '0.8rem', color: '#888', fontWeight: 600 }}>{stop.dayIdx + 1} of {stop.totalStops}</span>
             </div>
 
             <div className="popup-tabs">
@@ -98,7 +98,7 @@ const PlacePopup = ({ stop, onNavigate }) => {
                                     <div className="popup-marker-badge" style={{ marginRight: '8px', color: 'white' }}>{stop.markerNumber || <i className="fa-solid fa-location-dot"></i>}</div>
                                     <h3 className="popup-title" style={{ fontSize: '1.2rem', lineHeight: '1.3' }}>{name}</h3>
                                 </div>
-                                <div className="popup-description" style={{ marginBottom: '10px', fontSize: '0.9rem', color: '#3c4043' }}>
+                                <div className="popup-description" style={{ marginBottom: '10px', fontSize: '0.9rem', color: 'var(--text-light)' }}>
                                     {cardData.generatedDescription || cardData.description || description || "No description available."}
                                 </div>
                                 <button className="popup-btn-added" style={{ padding: '6px 12px', fontSize: '0.85rem' }}><i className="fa-solid fa-bookmark"></i> Added <i className="fa-solid fa-chevron-down"></i></button>
@@ -156,9 +156,9 @@ const PlacePopup = ({ stop, onNavigate }) => {
                         {/* Tips / Reasons List */}
                         {cardData.reasonsToVisit && cardData.reasonsToVisit.length > 0 && (
                             <div className="tips-list" style={{ marginBottom: '15px' }}>
-                                <h4 style={{ fontSize: '0.9rem', marginBottom: '6px', fontWeight: 600, color: '#202124' }}>Tips for visiting</h4>
+                                <h4 style={{ fontSize: '0.9rem', marginBottom: '6px', fontWeight: 600, color: 'var(--text-main)' }}>Tips for visiting</h4>
                                 {cardData.reasonsToVisit.slice(0, 3).map((tip, i) => (
-                                    <div key={i} className="tip-item" style={{ display: 'flex', gap: '8px', marginBottom: '6px', fontSize: '0.9rem', color: '#3c4043' }}>
+                                    <div key={i} className="tip-item" style={{ display: 'flex', gap: '8px', marginBottom: '6px', fontSize: '0.9rem', color: 'var(--text-light)' }}>
                                         <i className="fa-regular fa-lightbulb" style={{ marginTop: '3px', color: '#5f6368' }}></i>
                                         <span>{tip}</span>
                                     </div>
@@ -200,7 +200,7 @@ const PlacePopup = ({ stop, onNavigate }) => {
                                             <i className="fa-regular fa-clock detail-icon" style={{ marginTop: '2px' }}></i>
                                             <div className="detail-text" style={{ width: '100%' }}>
                                                 <div style={{ fontWeight: 500, color: '#202124', marginBottom: '4px' }}>
-                                                    {isOpen ? <span style={{ color: 'green' }}>Open Now</span> : (isOpen === false ? <span style={{ color: '#d93025' }}>Closed</span> : (hoursData.length > 0 ? <span style={{ color: '#5f6368' }}>Hours</span> : null))}
+                                                    {isOpen ? <span style={{ color: 'green' }}>Open Now</span> : (isOpen === false ? <span style={{ color: '#d93025' }}>Closed</span> : (hoursData.length > 0 ? <span style={{ color: 'var(--text-light)' }}>Hours</span> : null))}
                                                 </div>
                                                 <div className="day-letters">
                                                     {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d, i) => {
@@ -214,7 +214,7 @@ const PlacePopup = ({ stop, onNavigate }) => {
                                                     )}
                                                 </div>
                                                 {showHours && hoursData.length > 0 && (
-                                                    <div className="all-hours-list" style={{ marginTop: '8px', color: '#3c4043' }}>
+                                                    <div className="all-hours-list" style={{ marginTop: '8px', color: 'var(--text-light)' }}>
                                                         {hoursData.map((text, i) => (
                                                             <div key={i} style={{ fontSize: '0.85rem', marginBottom: '2px' }}>{text}</div>
                                                         ))}
@@ -297,7 +297,7 @@ const PlacePopup = ({ stop, onNavigate }) => {
                     <div className="reviews-tab-container">
                         {/* Summary Block */}
                         <div className="reviews-summary" style={{ marginBottom: '20px' }}>
-                            <p style={{ fontSize: '0.9rem', color: '#3c4043', lineHeight: '1.5', marginBottom: '15px' }}>
+                            <p style={{ fontSize: '0.9rem', color: 'var(--text-light)', lineHeight: '1.5', marginBottom: '15px' }}>
                                 {cardData.generatedDescription || description}
                             </p>
 
@@ -350,7 +350,7 @@ const PlacePopup = ({ stop, onNavigate }) => {
                                         <div style={{ color: '#70757a', fontSize: '0.85rem' }}>• {rev.relativePublishTimeDescription}</div>
                                         <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="14" alt="G" style={{ marginLeft: 'auto' }} />
                                     </div>
-                                    <div style={{ fontSize: '0.9rem', color: '#3c4043', lineHeight: '1.5' }}>
+                                    <div style={{ fontSize: '0.9rem', color: 'var(--text-light)', lineHeight: '1.5' }}>
                                         {rev.text?.text}
                                     </div>
                                 </div>

@@ -1,25 +1,55 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, useMap, Polyline, LayersControl, Rectangle, useMapEvents, ScaleControl } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import { GoogleMap, useJsApiLoader, Polyline, OverlayView, Rectangle } from '@react-google-maps/api';
 import PlacePopup from './PlacePopup';
 import { useApp } from '../../context/AppContext';
 
-// Fix for default marker icon
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+// Libraries to load from Google Maps API
+const libraries = ['geometry', 'places'];
 
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
+const containerStyle = {
+    width: '100%',
+    height: '100%',
+    borderRadius: '1.5rem', // ROUNDED CORNERS
+    overflow: 'hidden'      // MATCH IMAGE
+};
 
-L.Marker.prototype.options.icon = DefaultIcon;
+// Light Theme Styles
+const lightMapStyles = [
+    { elementType: "geometry", stylers: [{ color: "#e0e0e0" }] },
+    { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#f5f5f5" }] },
+    { featureType: "administrative.land_parcel", stylers: [{ visibility: "off" }] },
+    { featureType: "poi", stylers: [{ visibility: "off" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+    { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#e0e7ef" }] }
+];
 
+// Dark Theme Styles
+const darkMapStyles = [
+    { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+    { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }] },
+    { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }] },
+    { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#263c3f" }] },
+    { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#6b9a76" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#38414e" }] },
+    { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#212a37" }] },
+    { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#9ca5b3" }] },
+    { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#746855" }] },
+    { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#1f2835" }] },
+    { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#f3d19c" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#17263c" }] },
+    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#515c6d" }] },
+    { featureType: "water", elementType: "labels.text.stroke", stylers: [{ color: "#17263c" }] }
+];
+
+
+// Helper to decode Polyline
 function decodePolyline(encoded) {
+    if (!encoded) return [];
     var points = [];
     var index = 0, len = encoded.length;
     var lat = 0, lng = 0;
@@ -41,228 +71,361 @@ function decodePolyline(encoded) {
         } while (b >= 0x20);
         var dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
         lng += dlng;
-        points.push([lat / 1e5, lng / 1e5]);
+        points.push({ lat: lat / 1e5, lng: lng / 1e5 });
     }
     return points;
 }
 
-const MapController = ({ center, zoom, activeView, currentTripData, activeRoute, minimapTarget, onMapClick, selectedMarkerId }) => {
-    const map = useMap();
-
-    useMapEvents({
-        click: () => {
-            // Close popup logic if needed, passed via onMapClick prop to parent
-            if (onMapClick) onMapClick(null);
-        }
-    });
-
-    useEffect(() => {
-        if (minimapTarget) {
-            map.flyTo(minimapTarget.center, minimapTarget.zoom);
-        } else if (activeRoute) {
-            const bounds = L.latLngBounds([activeRoute.start, activeRoute.end]);
-            map.fitBounds(bounds, { padding: [50, 50] });
-        } else if (center) {
-            // Check if we are focusing on a marker (implied by zoom 15 + selectedMarkerId presence)
-            if (activeView === 'itinerary' && selectedMarkerId && zoom === 15) {
-                // Determine offset to place marker at 1/3 from top
-                // Center is 1/2. Target is 1/3. Diff is 1/6 screen height.
-                // We need to move the MAP CENTER down (increase Y pixel) by 1/6th of height
-                // to make the MARKER appear up.
-                const mapSize = map.getSize();
-                if (mapSize.y > 0) {
-                    const offsetPixels = mapSize.y * (1.0 / 6.0);
-                    const targetLatLng = L.latLng(center);
-                    const targetPoint = map.project(targetLatLng, zoom);
-                    const newCenterPoint = targetPoint.add([0, offsetPixels]);
-                    const newCenterLatLng = map.unproject(newCenterPoint, zoom);
-
-                    map.flyTo(newCenterLatLng, zoom, { duration: 1.5 });
-                } else {
-                    map.flyTo(center, zoom || 15);
-                }
-            } else {
-                map.flyTo(center, zoom || 15);
-            }
-        } else if (activeView === 'itinerary' && currentTripData && currentTripData.days.length > 0) {
-            // Auto-zoom to itinerary bounds
-            const allStops = currentTripData.days.flatMap(day => day.stops);
-            if (allStops.length > 0) {
-                const bounds = L.latLngBounds(allStops.map(s => [s.lat, s.lng]));
-                map.fitBounds(bounds, { padding: [50, 50] });
-            }
-        }
-    }, [center, zoom, map, activeView, currentTripData, activeRoute, minimapTarget, selectedMarkerId]);
-    return null;
-};
-
-const Legend = ({ currentTripData }) => {
-    const map = useMap();
-
-    useEffect(() => {
-        if (!currentTripData) return;
-
-        const legend = L.control({ position: 'bottomright' });
-
-        legend.onAdd = () => {
-            const div = L.DomUtil.create('div', 'info legend modern-legend');
-            const totalDays = currentTripData.days.length;
-            const totalPlaces = currentTripData.days.reduce((acc, day) => acc + day.stops.length, 0);
-
-            div.innerHTML = `
-                <h4>Trip Stats</h4>
-                <div class="legend-item"><i class="fa-regular fa-calendar"></i> ${totalDays} Days</div>
-                <div class="legend-item"><i class="fa-solid fa-location-dot"></i> ${totalPlaces} Places</div>
-            `;
-            return div;
-        };
-
-        legend.addTo(map);
-
-        return () => {
-            legend.remove();
-        };
-    }, [map, currentTripData]);
-
-    return null;
-};
-
-const LayerTracker = ({ onLayerChange }) => {
-    const map = useMap();
-    useEffect(() => {
-        const handler = (e) => {
-            onLayerChange(e.name);
-        };
-        map.on('baselayerchange', handler);
-        return () => {
-            map.off('baselayerchange', handler);
-        };
-    }, [map, onLayerChange]);
-    return null;
-};
-
-const BoundsReporter = ({ onBoundsChange }) => {
-    const map = useMap();
-
-    useEffect(() => {
-        if (!map) return;
-
-        const updateBounds = () => {
-            onBoundsChange(map.getBounds());
-        };
-
-        // Initial bounds
-        updateBounds();
-
-        map.on('move', updateBounds);
-        map.on('zoom', updateBounds);
-
-        return () => {
-            map.off('move', updateBounds);
-            map.off('zoom', updateBounds);
-        };
-    }, [map, onBoundsChange]);
-
-    return null;
-};
-
-const MinimapClickHandler = ({ onMapClick }) => {
-    useMapEvents({
-        click: (e) => {
-            onMapClick(e.latlng);
-        },
-    });
-    return null;
-};
-
-const Minimap = ({ bounds, theme, onMapClick }) => {
-    const minimapStyle = {
-        position: 'absolute',
-        bottom: '20px',
-        left: '20px',
-        width: '150px',
-        height: '100px',
-        zIndex: 1000,
-        border: '2px solid rgba(255, 255, 255, 0.7)',
-        borderRadius: '8px',
-        overflow: 'hidden',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
-        cursor: 'pointer'
-    };
-
-    const lightTile = "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png";
-    const darkTile = "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png";
-
-    // USA Center
-    const usaCenter = [39.8283, -98.5795];
-    const usaZoom = 1;
-
+const MapLegend = () => {
     return (
-        <div style={minimapStyle}>
-            <MapContainer
-                center={usaCenter}
-                zoom={usaZoom}
-                zoomControl={false}
-                scrollWheelZoom={false}
-                doubleClickZoom={false}
-                touchZoom={false}
-                dragging={false}
-                style={{ height: '100%', width: '100%' }}
-            >
-                <TileLayer
-                    url={theme === 'dark' ? darkTile : lightTile}
-                />
-                <MinimapClickHandler onMapClick={onMapClick} />
-                {bounds && (
-                    <Rectangle
-                        bounds={bounds}
-                        pathOptions={{ color: 'var(--primary-orange)', weight: 1, fillOpacity: 0.1 }}
-                    />
-                )}
-            </MapContainer>
+        <div style={{
+            position: 'absolute',
+            bottom: '80px',
+            right: '10px',
+            background: 'white',
+            padding: '10px 14px',
+            borderRadius: '12px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            zIndex: 1000,
+            fontSize: '0.85rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px'
+        }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{
+                    width: '18px', height: '18px',
+                    borderRadius: '50%', background: '#fa4d4d',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: 'white', fontSize: '0.6rem', fontWeight: 'bold'
+                }}>1</span>
+                <span style={{ color: 'black', fontWeight: 500 }}>Places</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{
+                    width: '18px', height: '18px',
+                    borderRadius: '50%', background: '#9b59b6',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: 'white', fontSize: '0.6rem'
+                }}><i className="fa-solid fa-bed" style={{ fontSize: '0.6rem' }}></i></span>
+                <span style={{ color: 'black', fontWeight: 500 }}>Hotels</span>
+            </div>
         </div>
     );
 };
 
+// TRIP STATS OVERLAY
+const TripStats = ({ tripData }) => {
+    if (!tripData || !tripData.days) return null;
+
+    const daysCount = tripData.days.length;
+    const placesCount = tripData.days.reduce((acc, day) => acc + day.stops.length, 0);
+
+    return (
+        <div style={{
+            position: 'absolute',
+            bottom: '150px', // Above legend
+            right: '10px',
+            background: 'white',
+            padding: '12px 16px',
+            borderRadius: '12px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)', // Soft shadow
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
+            color: '#333'
+        }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#fa4d4d', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Trip Stats
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 600 }}>
+                <i className="fa-regular fa-calendar" style={{ color: '#666' }}></i>
+                <span>{daysCount} Days</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 600 }}>
+                <i className="fa-solid fa-location-dot" style={{ color: '#666' }}></i>
+                <span>{placesCount} Places</span>
+            </div>
+            {/* Optional Distance if needed, can add later */}
+        </div>
+    );
+};
+
+// MODERN MAP TYPE SELECTOR
+const MapTypeSelector = ({ map, currentType }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleSelect = (type) => {
+        if (map) {
+            map.setMapTypeId(type);
+            setIsOpen(false);
+        }
+    };
+
+    return (
+        <div
+            style={{
+                position: 'absolute',
+                top: '10px',
+                left: '10px', // Top-Left position
+                zIndex: 1000,
+            }}
+            onMouseEnter={() => setIsOpen(true)}
+            onMouseLeave={() => setIsOpen(false)}
+        >
+            <div style={{
+                width: '40px',
+                height: '40px',
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                cursor: 'pointer',
+                color: '#333'
+            }}>
+                <i className="fa-solid fa-layer-group"></i>
+            </div>
+
+            {isOpen && (
+                <div style={{
+                    position: 'absolute',
+                    top: '48px',
+                    left: 0,
+                    background: 'white',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    padding: '8px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                    width: '120px'
+                }}>
+                    <div
+                        onClick={() => handleSelect('roadmap')}
+                        style={{ padding: '8px', borderRadius: '4px', cursor: 'pointer', background: currentType === 'roadmap' ? '#f0f0f0' : 'transparent', fontSize: '0.9rem', color: '#333' }}
+                    >
+                        Map
+                    </div>
+                    <div
+                        onClick={() => handleSelect('satellite')}
+                        style={{ padding: '8px', borderRadius: '4px', cursor: 'pointer', background: currentType === 'satellite' ? '#f0f0f0' : 'transparent', fontSize: '0.9rem', color: '#333' }}
+                    >
+                        Satellite
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+
+// Simple MiniMap Component
+const MiniMap = ({ onLoad, options, viewportBounds }) => {
+    return (
+        <GoogleMap
+            mapContainerStyle={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                width: '150px',
+                height: '150px',
+                borderRadius: '12px', // Rounder
+                boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+                zIndex: 900,
+                border: '3px solid white' // Thicker border
+            }}
+            initialCenter={{ lat: 0, lng: 0 }}
+            zoom={8}
+            onLoad={onLoad}
+            options={options}
+        >
+            {/* Viewport Rectangle */}
+            {viewportBounds && (
+                <Rectangle
+                    bounds={viewportBounds}
+                    options={{
+                        strokeColor: '#fa4d4d', // Red stroke
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        fillColor: '#fa4d4d',
+                        fillOpacity: 0.15,
+                        clickable: false,
+                        draggable: false,
+                        editable: false,
+                        zIndex: 1000
+                    }}
+                />
+            )}
+        </GoogleMap>
+    )
+}
+
+
 const MapView = ({ activeView, currentTripData, mapCenter, mapZoom, onMarkerClick, activeRoute, selectedMarkerId, onMapClick, onNavigate }) => {
     const { theme } = useApp();
-    const [routePositions, setRoutePositions] = useState(null);
-    const [activeLayer, setActiveLayer] = useState('Street Map');
-    const [mapBounds, setMapBounds] = useState(null);
-    const [minimapTarget, setMinimapTarget] = useState(null);
+    const [map, setMap] = useState(null);
+    const [routePositions, setRoutePositions] = useState([]);
+    const [mapTypeId, setMapTypeId] = useState('roadmap'); // Track map type state
+
+    // MiniMap Ref & State
+    const miniMapRef = useRef(null);
+    const [viewportBounds, setViewportBounds] = useState(null);
+
+    // Track if we've done the initial zoom
+    const initialZoomDone = useRef(false);
+
+    const { isLoaded } = useJsApiLoader({
+        id: 'google-map-script',
+        googleMapsApiKey: "AIzaSyCmHV3xkO2aRDnuNUB-4nyLjeDT123_lbI", // PROVIDED KEY
+        libraries
+    });
+
+    const onLoad = useCallback(function callback(mapInstance) {
+        setMap(mapInstance);
+    }, []);
+
+    const onUnmount = useCallback(function callback(map) {
+        setMap(null);
+        miniMapRef.current = null;
+    }, []);
+
+    // Callback for MiniMap load
+    const onMiniMapLoad = useCallback((miniMapInstance) => {
+        miniMapRef.current = miniMapInstance;
+    }, []);
+
+    // Sync MiniMap center when main map moves
+    const handleCenterChanged = () => {
+        if (map && miniMapRef.current) {
+            const center = map.getCenter();
+            if (center) {
+                miniMapRef.current.setCenter(center);
+            }
+        }
+    };
+
+    // Sync Viewport Rectangle & Map Type tracking
+    const handleBoundsChanged = () => {
+        if (map) {
+            setViewportBounds(map.getBounds());
+        }
+    };
+
+    // Track map type changes if user uses default controls (if enabled)
+    const handleMapTypeChanged = () => {
+        if (map) {
+            setMapTypeId(map.getMapTypeId());
+        }
+    };
+
+    // Memoize options 
+    const mapOptions = useMemo(() => ({
+        styles: theme === 'dark' ? darkMapStyles : lightMapStyles,
+        disableDefaultUI: true, // DISABLE DEFAULT UI AGAIN - we are using CUSTOM controls
+        mapTypeControl: false, // Custom implementation
+        scaleControl: true, // Keep scale
+        streetViewControl: false,
+        fullscreenControl: false,
+        zoomControl: false,
+        minZoom: 2
+    }), [theme]);
+
+    const miniMapOptions = useMemo(() => ({
+        styles: theme === 'dark' ? darkMapStyles : lightMapStyles,
+        disableDefaultUI: true,
+        zoomControl: false,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+        draggable: false,
+        clickableIcons: false
+    }), [theme]);
+
+    const defaultCenter = useMemo(() => ({ lat: 20, lng: 0 }), []);
+
+    const centerProp = useMemo(() => {
+        return mapCenter ? { lat: mapCenter[0], lng: mapCenter[1] } : defaultCenter;
+    }, [mapCenter, defaultCenter]);
+
+    // Effect to handle view changes (center/zoom) and Auto-Fit
+    useEffect(() => {
+        if (map) {
+            if (activeView === 'itinerary' && currentTripData && currentTripData.days && currentTripData.days.length > 0) {
+                // Auto Zoom Logic - ONLY if we haven't done it yet and no specific selection
+                if (!selectedMarkerId && !mapCenter && !initialZoomDone.current) {
+                    const bounds = new window.google.maps.LatLngBounds();
+                    let hasPoints = false;
+                    currentTripData.days.forEach(day => {
+                        day.stops.forEach(stop => {
+                            bounds.extend({ lat: stop.lat, lng: stop.lng });
+                            hasPoints = true;
+                        });
+                    });
+                    if (hasPoints) {
+                        map.fitBounds(bounds);
+                        initialZoomDone.current = true;
+                    }
+                } else if (mapCenter) {
+                    // Logic to center at Top 1/3rd if an item is selected
+                    if (selectedMarkerId) {
+                        const bounds = map.getBounds();
+                        if (bounds) {
+                            // Calculate offset
+                            const span = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
+                            // To move point (currently at center) to top 1/3rd, we need to shift the map center SOUTH.
+                            // Currently point is at 0.5H. We want it at 0.33H (from top).
+                            // So map center (0.5H) needs to be at 0.66H relative to point? No.
+                            // Visually: 
+                            // [ ------- ] Top (0)
+                            // [   x     ] Target (1/3)
+                            // [         ]
+                            // [   C     ] Center (1/2)
+                            // [         ] Bottom (1)
+                            // So Center is below Target. Latitude decreases going South.
+                            // So Center Lat < Target Lat.
+                            // Target Lat = mapCenter.lat.
+                            // New Center Lat = Target Lat - Delta.
+                            // Delta in degrees?
+                            // Height of map in degrees is `span`.
+                            // Distance between 1/3 and 1/2 is (1/2 - 1/3) = 1/6.
+                            // So Delta = span * (1/6).
+                            const offset = span / 6;
+                            const targetLat = (mapCenter.lat || mapCenter[0]) - offset;
+
+                            map.panTo({ lat: targetLat, lng: mapCenter.lng || mapCenter[1] });
+                            if (map.getZoom() < 13) map.setZoom(15);
+                        } else {
+                            // Fallback
+                            map.panTo({ lat: mapCenter.lat || mapCenter[0], lng: mapCenter.lng || mapCenter[1] });
+                            map.setZoom(15);
+                        }
+                    } else {
+                        map.panTo({ lat: mapCenter.lat || mapCenter[0], lng: mapCenter.lng || mapCenter[1] });
+                        map.setZoom(mapZoom || 15);
+                    }
+                }
+            } else if (mapCenter) {
+                map.panTo({ lat: mapCenter.lat || mapCenter[0], lng: mapCenter.lng || mapCenter[1] });
+                map.setZoom(mapZoom || 2);
+            }
+        }
+    }, [map, mapCenter, mapZoom, activeView, selectedMarkerId, currentTripData]);
 
     // Derived Selected Stop Logic
     const getSelectedStop = () => {
         if (!selectedMarkerId || !currentTripData) return null;
         const [dIdx, sIdx] = selectedMarkerId.split('-').map(Number);
+
         if (currentTripData.days[dIdx] && currentTripData.days[dIdx].stops[sIdx]) {
             const stop = currentTripData.days[dIdx].stops[sIdx];
-            let globalPlaceCount = 0;
-            let totalStops = 0;
-            // Recalculate global count for marker display (inefficient but consistent)
-            for (let d = 0; d < currentTripData.days.length; d++) {
-                totalStops += currentTripData.days[d].stops.length;
-                for (let s = 0; s < currentTripData.days[d].stops.length; s++) {
-                    const st = currentTripData.days[d].stops[s];
-                    if (st.type !== 'hotel') globalPlaceCount++;
-                    if (d === dIdx && s === sIdx) {
-                        const markerDisplay = st.type === 'hotel' ? <i className="fa-solid fa-bed"></i> : globalPlaceCount;
-                        // Return enhanced object with navigation context
-                        // Calculate total stops up to this point or total in trip? Usually total in trip.
-                        // But let's compute total stops in the whole trip for "X of Y"
-                    }
-                }
-            }
-            // Second pass for total or just reuse logic? 
-            // Let's simplified:
             const allStops = currentTripData.days.flatMap((day, dayIndex) => day.stops.map((s, stopIndex) => ({ ...s, dayIndex, stopIndex })));
-            // Find current index in flattened list
             const flatIndex = allStops.findIndex(s => s.dayIndex === dIdx && s.stopIndex === sIdx);
 
-            // Re-get the marker number logic for display
             let currentMarkerNum = <i className="fa-solid fa-bed"></i>;
             if (stop.type !== 'hotel') {
-                // Count non-hotels before this
                 let count = 0;
                 for (let i = 0; i <= flatIndex; i++) {
                     if (allStops[i].type !== 'hotel') count++;
@@ -273,176 +436,181 @@ const MapView = ({ activeView, currentTripData, mapCenter, mapZoom, onMarkerClic
             return {
                 ...stop,
                 markerNumber: currentMarkerNum,
-                dayIdx: dIdx, // Keep original day index
+                dayIdx: dIdx,
                 stopIdx: sIdx,
-                flatIndex: flatIndex,
-                totalStops: allStops.length
+                totalStops: allStops.length,
+                globalIndex: flatIndex
             };
         }
         return null;
     };
-
     const selectedStop = getSelectedStop();
 
-
-    const handleMinimapClick = (latlng) => {
-        setMinimapTarget({ center: latlng, zoom: 9 }); // Zoom level 9 is approx 50 mile radius view
-    };
-
-    // Fetch route from OSRM or use provided polyline
+    // Fetch Route Logic & Zoom
     useEffect(() => {
         if (activeRoute) {
             if (activeRoute.polyline) {
-                // Decode polyline
-                const decoded = decodePolyline(activeRoute.polyline);
-                setRoutePositions(decoded);
+                const points = decodePolyline(activeRoute.polyline);
+                setRoutePositions(points);
+                // Zoom to Route
+                if (map && points.length > 0) {
+                    const bounds = new window.google.maps.LatLngBounds();
+                    points.forEach(p => bounds.extend(p));
+                    map.fitBounds(bounds);
+                }
             } else {
-                const mode = activeRoute.mode && activeRoute.mode.toLowerCase().includes('walk') ? 'walking' : 'driving';
-                const startLng = activeRoute.start[1];
-                const startLat = activeRoute.start[0];
-                const endLng = activeRoute.end[1];
-                const endLat = activeRoute.end[0];
-
-                const url = `https://router.project-osrm.org/route/v1/${mode}/${startLng},${startLat};${endLng},${endLat}?overview=full&geometries=geojson`;
-
-                fetch(url)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.routes && data.routes.length > 0) {
-                            // OSRM returns [lng, lat], Leaflet needs [lat, lng]
-                            const coordinates = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
-                            setRoutePositions(coordinates);
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Error fetching route:", err);
-                        // Fallback to straight line
-                        setRoutePositions([activeRoute.start, activeRoute.end]);
-                    });
+                const start = { lat: activeRoute.start[0], lng: activeRoute.start[1] };
+                const end = { lat: activeRoute.end[0], lng: activeRoute.end[1] };
+                const points = [start, end];
+                setRoutePositions(points);
+                // Zoom to Route
+                if (map) {
+                    const bounds = new window.google.maps.LatLngBounds();
+                    points.forEach(p => bounds.extend(p));
+                    map.fitBounds(bounds);
+                }
             }
         } else {
-            setRoutePositions(null);
+            setRoutePositions([]);
         }
-    }, [activeRoute]);
+    }, [activeRoute, map]);
 
-    // Custom DivIcon generator
-    const createCustomIcon = (type, index, isHotel) => {
-        const bgColor = isHotel ? '#9b59b6' : 'var(--primary-orange)';
-        const innerHtml = isHotel ? '<i class="fa-solid fa-bed"></i>' : index;
 
-        return L.divIcon({
-            className: 'custom',
-            html: `<div class='modern-map-marker' style='background-color:${bgColor}'>${innerHtml}</div>`,
-            iconSize: [32, 32],
-            iconAnchor: [16, 16]
-        });
-    };
-
-    const worldStops = [
-        { lat: 35.6762, lng: 139.6503, title: "Tokyo Adventure" },
-        { lat: 48.8566, lng: 2.3522, title: "Paris Getaway" },
-        { lat: 36.1699, lng: -115.1398, title: "Las Vegas Trip" }
-    ];
-
-    const lightTile = "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png";
-    const darkTile = "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png";
-    const satelliteTile = "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.png";
+    if (!isLoaded) return <div>Loading Map...</div>;
 
     return (
-        <div className={`map-container ${activeLayer === 'Satellite' ? 'satellite-mode' : ''}`} style={{ position: 'relative' }}>
-            <MapContainer center={[20, 0]} zoom={2} style={{ height: '100%', width: '100%' }} zoomControl={false}>
-                <LayerTracker onLayerChange={setActiveLayer} />
-                <BoundsReporter onBoundsChange={setMapBounds} />
-                <ScaleControl position="bottomright" />
-                <LayersControl position="topright">
-                    <LayersControl.BaseLayer checked={activeLayer === 'Street Map'} name="Street Map">
-                        <TileLayer
-                            key={theme}
-                            attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
-                            url={theme === 'dark' ? darkTile : lightTile}
-                        />
-                    </LayersControl.BaseLayer>
-                    <LayersControl.BaseLayer checked={activeLayer === 'Satellite'} name="Satellite">
-                        <TileLayer
-                            attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
-                            url={satelliteTile}
-                        />
-                    </LayersControl.BaseLayer>
-                </LayersControl>
-
-                <MapController
-                    center={mapCenter}
-                    zoom={mapZoom}
-                    activeView={activeView}
-                    currentTripData={currentTripData}
-                    activeRoute={activeRoute}
-                    minimapTarget={minimapTarget}
-                    selectedMarkerId={selectedMarkerId}
-                    onMapClick={(e) => {
-                        // Deselect logic if needed, typically passed from parent
-                        if (onMarkerClick) onMarkerClick(null);
-                    }}
-                />
-
-                {activeView === 'itinerary' && currentTripData && <Legend currentTripData={currentTripData} />}
-
-                {activeRoute && routePositions && (
+        <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '1.5rem', overflow: 'hidden' /* Container Rounding */ }}>
+            <GoogleMap
+                mapContainerStyle={containerStyle}
+                center={centerProp}
+                zoom={2}
+                onLoad={onLoad}
+                onUnmount={onUnmount}
+                options={mapOptions}
+                onClick={() => onMapClick && onMapClick(null)}
+                onCenterChanged={handleCenterChanged} // LIVE SYNC
+                onBoundsChanged={handleBoundsChanged} // VIEWPORT SYNC
+                onMapTypeIdChanged={handleMapTypeChanged} // Sync State
+            >
+                {/* Routes */}
+                {activeRoute && routePositions.length > 0 && (
                     <Polyline
-                        positions={routePositions}
-                        pathOptions={{
-                            color: '#4285F4', // Google Maps Blue
-                            weight: 6,
-                            opacity: 0.8,
-                            dashArray: activeRoute.mode && activeRoute.mode.toLowerCase().includes('walk') ? '1, 10' : null, // Dots for walking
-                            lineCap: 'round'
+                        path={routePositions}
+                        options={{
+                            strokeColor: '#4285F4',
+                            strokeOpacity: 0.8,
+                            strokeWeight: 6,
+                            icons: activeRoute.mode && activeRoute.mode.toLowerCase().includes('walk') ?
+                                [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 2 }, offset: '0', repeat: '10px' }] : null
                         }}
                     />
                 )}
 
+                {/* Markers with Custom OverlayView */}
                 {activeView === 'itinerary' && currentTripData && (() => {
                     let globalPlaceCount = 0;
                     return currentTripData.days.map((day, dIdx) => {
                         return day.stops.map((stop, sIdx) => {
                             if (stop.type !== 'hotel') globalPlaceCount++;
-                            // const markerDisplay = stop.type === 'hotel' ? <i className="fa-solid fa-bed"></i> : globalPlaceCount;
+                            const isHotel = stop.type === 'hotel';
+                            const isSelected = selectedMarkerId === `${dIdx}-${sIdx}`;
 
                             return (
-                                <Marker
+                                <OverlayView
                                     key={`${dIdx}-${sIdx}`}
-                                    position={[stop.lat, stop.lng]}
-                                    icon={createCustomIcon(stop.type, globalPlaceCount, stop.type === 'hotel')}
-                                    eventHandlers={{
-                                        click: (e) => {
-                                            L.DomEvent.stopPropagation(e); // Prevent map click
-                                            if (onMarkerClick) onMarkerClick(stop.lat, stop.lng, dIdx, sIdx);
-                                        }
-                                    }}
+                                    position={{ lat: stop.lat, lng: stop.lng }}
+                                    mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                                 >
-                                    {/* POPUP REMOVED: Using generic overlay instead */}
-                                </Marker>
+                                    <div
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (onMarkerClick) onMarkerClick(stop.lat, stop.lng, dIdx, sIdx);
+                                        }}
+                                        className="modern-map-marker"
+                                        style={{
+                                            backgroundColor: isHotel ? '#9b59b6' : '#fa4d4d',
+                                            width: '36px',
+                                            height: '36px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: 'white',
+                                            borderRadius: '50%',
+                                            fontWeight: 'bold',
+                                            fontSize: '0.85rem',
+                                            cursor: 'pointer',
+                                            transform: 'translate(-50%, -50%)',
+                                            boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                                            border: isSelected ? '3px solid white' : '2px solid white',
+                                            zIndex: isSelected ? 100 : 1
+                                        }}
+                                    >
+                                        {isHotel ? <i className="fa-solid fa-bed"></i> : globalPlaceCount}
+                                    </div>
+                                </OverlayView>
                             );
                         });
                     });
                 })()}
 
-                {activeView !== 'itinerary' && worldStops.map((stop, idx) => (
-                    <Marker
+                {/* World Stops / Others */}
+                {activeView !== 'itinerary' && [
+                    { lat: 35.6762, lng: 139.6503 },
+                    { lat: 48.8566, lng: 2.3522 },
+                    { lat: 36.1699, lng: -115.1398 }
+                ].map((stop, idx) => (
+                    <OverlayView
                         key={idx}
-                        position={[stop.lat, stop.lng]}
-                        icon={L.divIcon({ className: 'custom', html: `<div class='modern-map-marker' style='background-color:var(--primary-orange)'><i class="fa-solid fa-star"></i></div>`, iconSize: [32, 32], iconAnchor: [16, 16] })}
+                        position={stop}
+                        mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                     >
-                        {/* Optional: keep simple popup for world stops, or remove */}
-                    </Marker>
+                        <div
+                            className="modern-map-marker"
+                            style={{
+                                backgroundColor: '#fa4d4d',
+                                width: '36px', height: '36px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                color: 'white', borderRadius: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                border: '2px solid white',
+                                boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+                            }}
+                        >
+                            <i className="fa-solid fa-star"></i>
+                        </div>
+                    </OverlayView>
                 ))}
-            </MapContainer>
 
-            <Minimap bounds={mapBounds} theme={theme} onMapClick={handleMinimapClick} />
+
+            </GoogleMap>
+
+            {/* Custom Map Type Selector (Top-Left) */}
+            <MapTypeSelector map={map} currentType={mapTypeId} />
+
+            {/* MiniMap (Top-Right) */}
+            {activeView === 'itinerary' && (
+                <MiniMap
+                    onLoad={onMiniMapLoad}
+                    options={miniMapOptions}
+                    viewportBounds={viewportBounds}
+                />
+            )}
+
+            {/* Trip Stats (Bottom-Right, above Legend) */}
+            {activeView === 'itinerary' && <TripStats tripData={currentTripData} />}
+
+            {/* Legend (Bottom-Right) */}
+            {activeView === 'itinerary' && <MapLegend />}
 
             {/* Custom Overlay Panel for Popup */}
             {selectedStop && (
                 <div className="custom-map-panel-overlay">
                     <div className="panel-close-btn" onClick={() => onMarkerClick(null)}><i className="fa-solid fa-xmark"></i></div>
-                    <PlacePopup stop={selectedStop} onNavigate={onNavigate} />
+                    <PlacePopup
+                        key={selectedMarkerId}
+                        stop={selectedStop}
+                        onNavigate={onNavigate}
+                    />
                 </div>
             )}
         </div>

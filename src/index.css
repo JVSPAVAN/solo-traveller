@@ -770,7 +770,7 @@ input:checked+.slider:before {
 
 /* Tools Section */
 .features-section.alt-bg {
-  background: #f9fafb;
+  background: var(--bg-gray-box);
   /* Light gray bg */
   padding: 80px 20px;
   text-align: center;
@@ -790,7 +790,7 @@ input:checked+.slider:before {
 
 .tool-visual {
   height: 180px;
-  background: white;
+  background: var(--bg-card);
   border-radius: 12px;
   margin-bottom: 25px;
   display: flex;
@@ -841,7 +841,7 @@ input:checked+.slider:before {
   padding: 8px;
   border-bottom: 1px solid #eee;
   font-size: 0.85rem;
-  color: #4b5563;
+  color: var(--text-main);
 }
 
 .avatar-group {
@@ -3259,6 +3259,12 @@ input[type='text']::-webkit-calendar-picker-indicator {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  background: var(--bg-card);
+  color: var(--text-main);
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-card);
 }
 
 /* Custom Map Panel Overlay (replaces standard Popup) */
@@ -3342,7 +3348,7 @@ input[type='text']::-webkit-calendar-picker-indicator {
 
 .map-popup-card {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: white;
+  background: var(--bg-card);
   width: 100%;
   min-height: 100%;
   /* Ensure full height */
@@ -3350,13 +3356,13 @@ input[type='text']::-webkit-calendar-picker-indicator {
 
 .popup-tabs {
   display: flex;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-color);
   padding: 0 16px;
   margin-bottom: 15px;
   overflow-x: auto;
   flex-shrink: 0;
   /* Keep tabs visible */
-  background: white;
+  background: var(--bg-card);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -3401,12 +3407,12 @@ input[type='text']::-webkit-calendar-picker-indicator {
 }
 
 .footer-pill {
-  background: white;
-  border: 1px solid #e8eaed;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 100px;
   padding: 8px 16px;
   font-size: 0.85rem;
-  color: #3c4043;
+  color: var(--text-main);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -3454,7 +3460,8 @@ input[type='text']::-webkit-calendar-picker-indicator {
 
 .highlight-review-card {
   transition: transform 0.2s;
-  background: white;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
 }
 
 .highlight-review-card:hover {
@@ -3518,8 +3525,8 @@ input[type='text']::-webkit-calendar-picker-indicator {
   position: absolute;
   bottom: 100%;
   left: 0;
-  background: white;
-  border: 1px solid #ddd;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   padding: 8px 0;
@@ -3576,7 +3583,7 @@ input[type='text']::-webkit-calendar-picker-indicator {
 .popup-title {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #202124;
+  color: var(--text-main);
   line-height: 1.3;
   display: inline;
 }
@@ -3592,7 +3599,7 @@ input[type='text']::-webkit-calendar-picker-indicator {
 
 .popup-description {
   font-size: 0.9rem;
-  color: #3c4043;
+  color: var(--text-light);
   margin-bottom: 12px;
   line-height: 1.5;
 }
@@ -4190,7 +4197,7 @@ input[type='text']::-webkit-calendar-picker-indicator {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #f0f2f5;
+  background: var(--bg-hover);
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 0.85rem;
@@ -4201,7 +4208,7 @@ input[type='text']::-webkit-calendar-picker-indicator {
 }
 
 .chip-btn:hover {
-  background: #e1e4e8;
+  background: var(--bg-gray-box);
   color: var(--text-main);
 }
 
@@ -4265,14 +4272,85 @@ input[type='text']::-webkit-calendar-picker-indicator {
   width: 580px;
   /* Expanded width when nav collapsed */
 }
+
 /* Navbar Brand Animations */
 .nav-logo-pulse {
-    display: inline-block;
-    animation: fluidPulse 3s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+  animation: fluidPulse 3s infinite cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes fluidPulse {
-    0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(250, 77, 77, 0)); }
-    50% { transform: scale(1.1); filter: drop-shadow(0 2px 5px rgba(250, 77, 77, 0.3)); }
-    100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(250, 77, 77, 0)); }
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(250, 77, 77, 0));
+  }
+
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 2px 5px rgba(250, 77, 77, 0.3));
+  }
+
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(250, 77, 77, 0));
+  }
+}
+
+/* --- NAVBAR FIXES --- */
+.bottom-navbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: var(--bg-sidebar);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 9500;
+  transition: transform 0.3s;
+}
+
+.bottom-navbar.show {
+  transform: translateY(0);
+}
+
+.bottom-navbar:not(.show) {
+  transform: translateY(100%);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.2s;
+}
+
+.nav-item.active {
+  color: var(--primary-orange);
+}
+
+.nav-item i {
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+}
+
+/* Ensure main content doesn't overlapping fixed bars */
+.main-container {
+  padding-top: 0;
+  height: 100vh !important;
+  /* Full height, map goes under transparent bars or user wants no gap */
+  margin-top: 0;
+}
+
+/* Specific for map view container to fit perfectly */
+#app-wrapper>div[style*="flex: 1"] {
+  height: 100vh;
+  margin-top: 0;
 }

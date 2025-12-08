@@ -22,7 +22,7 @@ import TemplateModal from './components/Modals/TemplateModal';
 import PaymentModal from './components/Shared/PaymentModal';
 
 function App() {
-  const { isLoggedIn, currentTripData, setCurrentTripData } = useApp();
+  const { isLoggedIn, currentTripData, setCurrentTripData, fetchPlaceCardData } = useApp();
 
   // Splash Screen Logic
   useEffect(() => {
@@ -104,6 +104,10 @@ function App() {
   const [expandedDay, setExpandedDay] = useState(null);
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
 
+
+
+  // ... (existing code)
+
   const handleMarkerClick = (lat, lng, dayIdx, stopIdx) => {
     if (lat === null) {
       setSelectedMarkerId(null);
@@ -116,6 +120,15 @@ function App() {
     setActiveRoute(null);
     setExpandedDay(dayIdx);
     setSelectedMarkerId(`${dayIdx}-${stopIdx}`);
+
+    // Trigger Data Fetch
+    if (currentTripData && currentTripData.days[dayIdx] && currentTripData.days[dayIdx].stops[stopIdx]) {
+      const stop = currentTripData.days[dayIdx].stops[stopIdx];
+      // Only fetch if place_id exists and we don't have cardData (or it's empty) - fetchPlaceCardData has internal check too but good to be safe
+      if (stop.place_id && (!stop.cardData || Object.keys(stop.cardData).length === 0)) {
+        fetchPlaceCardData(stop.place_id, stop.placeName || stop.name);
+      }
+    }
 
     setTimeout(() => {
       const card = document.getElementById(`card-${dayIdx}-${stopIdx}`);
