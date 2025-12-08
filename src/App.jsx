@@ -23,6 +23,17 @@ import PaymentModal from './components/Shared/PaymentModal';
 
 function App() {
   const { isLoggedIn, currentTripData, setCurrentTripData } = useApp();
+
+  // Splash Screen Logic
+  useEffect(() => {
+    const splash = document.getElementById('splash-screen');
+    if (splash) {
+      setTimeout(() => {
+        splash.classList.add('fade-out');
+        setTimeout(() => splash.remove(), 1000);
+      }, 2000); // 2 seconds delay to show splash
+    }
+  }, []);
   const [activeView, setActiveView] = useState('landing');
   const [mapCenter, setMapCenter] = useState(null);
   const [mapZoom, setMapZoom] = useState(null);
@@ -36,8 +47,6 @@ function App() {
     auth: false,
     generic: false,
     reservation: false,
-    share: false,
-    planType: false,
     share: false,
     planType: false,
     template: false,

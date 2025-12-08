@@ -2617,6 +2617,43 @@ details.faq-item p {
   opacity: 0.9;
 }
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Navbar Brand Animations */
+.nav-marker-start {
+  animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.nav-route-line {
+  animation: drawLine 1s ease-in-out forwards;
+  animation-delay: 0.5s;
+}
+
+.nav-marker-end {
+  animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation-delay: 1.4s;
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes drawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 /* Interaction Components */
 .mentions-container {
   position: relative;
@@ -4227,4 +4264,15 @@ input[type='text']::-webkit-calendar-picker-indicator {
 .sidebar.expanded-width {
   width: 580px;
   /* Expanded width when nav collapsed */
+}
+/* Navbar Brand Animations */
+.nav-logo-pulse {
+    display: inline-block;
+    animation: fluidPulse 3s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fluidPulse {
+    0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(250, 77, 77, 0)); }
+    50% { transform: scale(1.1); filter: drop-shadow(0 2px 5px rgba(250, 77, 77, 0.3)); }
+    100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(250, 77, 77, 0)); }
 }

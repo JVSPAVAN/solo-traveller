@@ -6,8 +6,119 @@
     <title>SoloTraveller</title>
     <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+      :root {
+        --primary-orange: #fa4d4d;
+      }
+      body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+      #splash-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: #fdfbf7;
+        z-index: 99999;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; 
+        transition: opacity 0.8s, visibility 0.8s;
+      }
+      #splash-screen.fade-out { opacity: 0; visibility: hidden; }
+      
+      .brand-svg {
+        width: 120px;
+        height: 120px;
+        overflow: visible;
+      }
+
+      /* Markers */
+      .marker-path {
+        fill: var(--primary-orange);
+        transform-origin: center bottom;
+      }
+      
+      .marker-start {
+        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        transform-box: fill-box;
+      }
+      
+      .marker-end {
+        opacity: 0;
+        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        animation-delay: 1.4s;
+        transform-box: fill-box;
+      }
+
+      /* Connecting Line */
+      .route-line {
+        fill: none;
+        stroke: var(--primary-orange);
+        stroke-width: 8;
+        stroke-linecap: round;
+        stroke-dasharray: 160;
+        stroke-dashoffset: 160;
+        animation: drawLine 1s ease-in-out forwards;
+        animation-delay: 0.5s;
+      }
+
+      /* Text */
+      .splash-text {
+        margin-top: 20px;
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--primary-orange);
+        opacity: 0;
+        transform: translateY(10px);
+        animation: fadeUp 0.8s ease-out forwards;
+        animation-delay: 1.8s;
+      }
+
+      @keyframes popIn {
+        0% { transform: scale(0); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+
+      @keyframes drawLine {
+        to { stroke-dashoffset: 0; }
+      }
+
+      @keyframes fadeUp {
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .splash-loader { 
+        margin-top: 30px; 
+        width: 40px; height: 4px; 
+        background: #e0e0e0; 
+        border-radius: 2px; 
+        overflow: hidden; 
+        position: relative;
+        opacity: 0;
+        animation: fadeIn 0.5s forwards;
+        animation-delay: 2s;
+      }
+      @keyframes fadeIn { to { opacity: 1; } }
+      .splash-loader::after { content: ''; position: absolute; width: 0%; height: 100%; background: var(--primary-orange); animation: loadBar 2s ease-in-out forwards; }
+    </style>
   </head>
   <body>
+    <div id="splash-screen">
+      <!-- Custom SVG Logo Animation mimicking fa-route -->
+      <svg class="brand-svg" viewBox="0 0 100 100">
+        <!-- Marker 1 (Start - Bottom Leftish) -->
+        <path class="marker-path marker-start" d="M30,60 C15,60 15,35 30,35 C45,35 45,60 30,60 L30,60 Z" transform="translate(0, -10)" />
+        
+        <!-- Connecting Line (Curved from Marker 1 bottom to Marker 2 bottom) -->
+        <!-- Path starts at 30,50 (tip of marker 1 approx) and goes to 70,30 (tip of marker 2) -->
+        <!-- Actually marker tip is center bottom. Let's say center of circle is 30,45. Tip is 30,60. -->
+        <!-- We want line from 30,60 to 70,40? No, fa-route is typically side by side or diagonal. -->
+        <!-- Let's do a nice curve. Start 30,50 -> End 70,30 -->
+        <path class="route-line" d="M30,50 Q50,80 70,30" />
+        
+        <!-- Marker 2 (End - Top Rightish) -->
+        <!-- Center roughly at 70, 15 -->
+        <path class="marker-path marker-end" d="M70,40 C55,40 55,15 70,15 C85,15 85,40 70,40 L70,40 Z" transform="translate(0, -10)" />
+      </svg>
+      
+      <div class="splash-text">SoloTraveller</div>
+      <div class="splash-loader"></div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
