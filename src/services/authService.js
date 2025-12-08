@@ -2,7 +2,7 @@ import axios from 'axios';
 import JSEncrypt from 'jsencrypt';
 import { PUBLIC_KEY } from '../utils/publicKey';
 
-const API_URL = 'http://localhost:5000/api/auth';
+const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth`;
 
 const encryptPassword = (password) => {
   const encryptor = new JSEncrypt();
