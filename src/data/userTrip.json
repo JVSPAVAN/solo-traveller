@@ -1,0 +1,424 @@
+{
+  "tripSummary": {
+    "destination": "Nevada (Las Vegas–based)",
+    "baseCity": "Las Vegas",
+    "startDate": "2025-12-02",
+    "totalDays": 3,
+    "assumptions": {
+      "tripFocus": "enjoyment & popular experiences",
+      "budgetLevel": "moderate",
+      "transportation": "car available",
+      "dailyPace": "moderate (start ~9:00, end by evening)",
+      "interests": [
+        "attractions",
+        "scenic spots",
+        "local food",
+        "entertainment"
+      ]
+    }
+  },
+  "days": [
+    {
+      "day": 1,
+      "date": "2025-12-02",
+      "theme": "Iconic Las Vegas Strip & Night Views",
+      "stops": [
+        {
+          "type": "breakfast",
+          "name": "Eggslut at The Cosmopolitan",
+          "time": "09:00",
+          "durationMinutes": 60,
+          "placeDetails": {
+            "note": "Trendy breakfast spot inside The Cosmopolitan known for gourmet egg sandwiches and casual vibe. Expect a line in the morning."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "Explore The Cosmopolitan & City Center Area",
+          "time": "10:15",
+          "durationMinutes": 90,
+          "placeDetails": {
+            "note": "Walk through The Cosmopolitan, Aria, and the CityCenter complex. Check out casino floors, art installations, and Strip views from upper levels."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "Bellagio Conservatory & Fountains (Daytime Visit)",
+          "time": "12:00",
+          "durationMinutes": 90,
+          "placeDetails": {
+            "note": "Seasonally themed indoor garden display plus a preview of the famous fountains from the Strip sidewalk. Free, photogenic, and very central."
+          }
+        },
+        {
+          "type": "lunch",
+          "name": "Mon Ami Gabi (Paris Las Vegas)",
+          "time": "13:30",
+          "durationMinutes": 75,
+          "placeDetails": {
+            "note": "Classic French bistro with a prime patio facing the Bellagio fountains. Great for people‑watching and a relaxed mid‑day meal."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "Walk the Central Strip (Paris → Planet Hollywood → Miracle Mile Shops)",
+          "time": "15:00",
+          "durationMinutes": 120,
+          "placeDetails": {
+            "note": "Self‑guided walk through themed resorts and an indoor mall. Good for light shopping, photos, and getting a feel for the Strip."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "LINQ Promenade & High Roller (Evening)",
+          "time": "17:30",
+          "durationMinutes": 150,
+          "placeDetails": {
+            "note": "Outdoor pedestrian area with shops and bars plus the High Roller observation wheel for sunset or night views over the Strip."
+          }
+        },
+        {
+          "type": "dinner",
+          "name": "Yard House or Favorite Bistro (LINQ Promenade)",
+          "time": "19:30",
+          "durationMinutes": 75,
+          "placeDetails": {
+            "note": "Casual dinner options right along the promenade; both have broad menus and are easy for a moderate budget."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "Bellagio Fountains (Night Show)",
+          "time": "21:00",
+          "durationMinutes": 45,
+          "placeDetails": {
+            "note": "Return toward Bellagio to catch at least one full nighttime fountain show; music and lighting are more dramatic after dark."
+          }
+        }
+      ],
+      "transport": [
+        {
+          "from": "Hotel/Base in Las Vegas",
+          "to": "The Cosmopolitan of Las Vegas (for Eggslut)",
+          "mode": "car or rideshare",
+          "estimatedDurationMinutes": 10,
+          "estimatedDistanceKm": 3
+        },
+        {
+          "from": "Cosmopolitan/City Center",
+          "to": "Bellagio Conservatory",
+          "mode": "walking",
+          "estimatedDurationMinutes": 10,
+          "estimatedDistanceKm": 0.6
+        },
+        {
+          "from": "Bellagio",
+          "to": "Paris/Mon Ami Gabi",
+          "mode": "walking",
+          "estimatedDurationMinutes": 10,
+          "estimatedDistanceKm": 0.6
+        },
+        {
+          "from": "Paris/Planet Hollywood area",
+          "to": "LINQ Promenade/High Roller",
+          "mode": "walking",
+          "estimatedDurationMinutes": 15,
+          "estimatedDistanceKm": 0.9
+        },
+        {
+          "from": "LINQ Promenade",
+          "to": "Bellagio Fountains (return)",
+          "mode": "walking",
+          "estimatedDurationMinutes": 15,
+          "estimatedDistanceKm": 0.9
+        },
+        {
+          "from": "Bellagio area",
+          "to": "Hotel/Base in Las Vegas",
+          "mode": "car or rideshare",
+          "estimatedDurationMinutes": 10,
+          "estimatedDistanceKm": 3
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "date": "2025-12-03",
+      "theme": "Classic Vegas & Downtown / Fremont Street",
+      "stops": [
+        {
+          "type": "breakfast",
+          "name": "Peppermill Restaurant & Fireside Lounge",
+          "time": "09:00",
+          "durationMinutes": 75,
+          "placeDetails": {
+            "note": "Old‑school Vegas diner with huge portions and a classic neon vibe on the north Strip. Great way to start a sightseeing day."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "Welcome to Fabulous Las Vegas Sign",
+          "time": "11:00",
+          "durationMinutes": 45,
+          "placeDetails": {
+            "note": "Iconic photo stop at the classic Vegas sign on the south Strip. Expect a short line for photos during the day."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "Mandalay Bay → Luxor → Excalibur Walkthrough",
+          "time": "12:00",
+          "durationMinutes": 90,
+          "placeDetails": {
+            "note": "Explore the south Strip resorts with themed architecture (pyramid, castle) and indoor attractions; optional quick casino or shopping stops."
+          }
+        },
+        {
+          "type": "lunch",
+          "name": "Casual Lunch at Luxor or Excalibur Food Court/Restaurant",
+          "time": "13:45",
+          "durationMinutes": 60,
+          "placeDetails": {
+            "note": "Choose from several moderate‑priced spots in either resort; easy for a quick break before your afternoon rest."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "Afternoon Break / Pool or Rest at Hotel",
+          "time": "15:00",
+          "durationMinutes": 120,
+          "placeDetails": {
+            "note": "Head back to your base to relax, freshen up, or enjoy the hotel amenities before heading downtown in the evening."
+          }
+        },
+        {
+          "type": "dinner",
+          "name": "Pizza Rock (Near Downtown / Fremont)",
+          "time": "18:30",
+          "durationMinutes": 75,
+          "placeDetails": {
+            "note": "Popular pizzeria near Fremont Street with award‑winning pies; good value and a fun atmosphere before exploring downtown."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "The Mob Museum",
+          "time": "20:00",
+          "durationMinutes": 90,
+          "placeDetails": {
+            "note": "Interactive museum covering organized crime and law enforcement history in the U.S. and Vegas; interesting exhibits and speakeasy bar."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "Fremont Street Experience",
+          "time": "21:45",
+          "durationMinutes": 105,
+          "placeDetails": {
+            "note": "Pedestrian mall with overhead LED canopy shows, live music stages, street performers, and classic casinos. Very lively at night."
+          }
+        }
+      ],
+      "transport": [
+        {
+          "from": "Hotel/Base in Las Vegas",
+          "to": "Peppermill Restaurant (north Strip)",
+          "mode": "car",
+          "estimatedDurationMinutes": 10,
+          "estimatedDistanceKm": 4
+        },
+        {
+          "from": "Peppermill (north Strip)",
+          "to": "Welcome to Fabulous Las Vegas Sign (south Strip)",
+          "mode": "car",
+          "estimatedDurationMinutes": 15,
+          "estimatedDistanceKm": 7
+        },
+        {
+          "from": "Vegas Sign",
+          "to": "Mandalay Bay / Luxor / Excalibur",
+          "mode": "car or walking (if already parked nearby)",
+          "estimatedDurationMinutes": 5,
+          "estimatedDistanceKm": 1.5
+        },
+        {
+          "from": "South Strip (Excalibur area)",
+          "to": "Hotel/Base in Las Vegas",
+          "mode": "car",
+          "estimatedDurationMinutes": 10,
+          "estimatedDistanceKm": 5
+        },
+        {
+          "from": "Hotel/Base in Las Vegas",
+          "to": "Pizza Rock (downtown)",
+          "mode": "car",
+          "estimatedDurationMinutes": 15,
+          "estimatedDistanceKm": 8
+        },
+        {
+          "from": "Pizza Rock",
+          "to": "The Mob Museum",
+          "mode": "walking",
+          "estimatedDurationMinutes": 5,
+          "estimatedDistanceKm": 0.3
+        },
+        {
+          "from": "The Mob Museum",
+          "to": "Fremont Street Experience",
+          "mode": "walking",
+          "estimatedDurationMinutes": 5,
+          "estimatedDistanceKm": 0.3
+        },
+        {
+          "from": "Fremont Street Experience",
+          "to": "Hotel/Base in Las Vegas",
+          "mode": "car",
+          "estimatedDurationMinutes": 15,
+          "estimatedDistanceKm": 8
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "date": "2025-12-04",
+      "theme": "Nevada Scenery: Red Rock Canyon & Desert Views",
+      "stops": [
+        {
+          "type": "breakfast",
+          "name": "Local Café Near Your Hotel (e.g., The Original Pancake House or Similar)",
+          "time": "08:30",
+          "durationMinutes": 60,
+          "placeDetails": {
+            "note": "Fuel up before heading out of town; choose a nearby sit‑down breakfast spot or your hotel’s café."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "Drive to Red Rock Canyon Area",
+          "time": "09:45",
+          "durationMinutes": 45,
+          "placeDetails": {
+            "note": "Head west out of Las Vegas toward the Red Rock Canyon area for desert and mountain scenery."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "Red Rock Canyon Scenic Loop & Short Walks",
+          "time": "10:30",
+          "durationMinutes": 150,
+          "placeDetails": {
+            "note": "Scenic drive with multiple viewpoints; pick 1–2 short walks suitable for a moderate, non‑technical outing and great photos."
+          }
+        },
+        {
+          "type": "lunch",
+          "name": "Red Rock Casino or Nearby Restaurant",
+          "time": "13:30",
+          "durationMinutes": 60,
+          "placeDetails": {
+            "note": "Stop at Red Rock Casino Resort & Spa or another nearby spot for a relaxed lunch after your scenic morning."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "Seven Magic Mountains (Colorful Desert Art Installation)",
+          "time": "15:00",
+          "durationMinutes": 60,
+          "placeDetails": {
+            "note": "Drive south of Las Vegas to see the large, brightly painted rock stacks in the open desert. Good for photos and a short walk."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "Return to Las Vegas & Afternoon Break",
+          "time": "16:30",
+          "durationMinutes": 90,
+          "placeDetails": {
+            "note": "Head back to your hotel to rest, pack up if needed, or enjoy one last swim or casino visit."
+          }
+        },
+        {
+          "type": "dinner",
+          "name": "Lotus of Siam or Similar Local Favorite",
+          "time": "18:30",
+          "durationMinutes": 75,
+          "placeDetails": {
+            "note": "Well‑known Thai restaurant favored by both locals and visitors, good for a flavorful final‑night dinner in Vegas."
+          }
+        },
+        {
+          "type": "attraction",
+          "name": "Optional Last Stroll on the Strip",
+          "time": "20:00",
+          "durationMinutes": 60,
+          "placeDetails": {
+            "note": "Take a final walk along whichever part of the Strip you enjoyed most, or pop into a favorite casino or bar before calling it a night."
+          }
+        }
+      ],
+      "transport": [
+        {
+          "from": "Hotel/Base in Las Vegas",
+          "to": "Red Rock Canyon Area",
+          "mode": "car",
+          "estimatedDurationMinutes": 35,
+          "estimatedDistanceKm": 27
+        },
+        {
+          "from": "Red Rock Canyon Scenic Loop",
+          "to": "Red Rock Casino or Nearby Lunch Spot",
+          "mode": "car",
+          "estimatedDurationMinutes": 15,
+          "estimatedDistanceKm": 10
+        },
+        {
+          "from": "Red Rock Casino Area",
+          "to": "Seven Magic Mountains",
+          "mode": "car",
+          "estimatedDurationMinutes": 40,
+          "estimatedDistanceKm": 45
+        },
+        {
+          "from": "Seven Magic Mountains",
+          "to": "Hotel/Base in Las Vegas",
+          "mode": "car",
+          "estimatedDurationMinutes": 30,
+          "estimatedDistanceKm": 32
+        },
+        {
+          "from": "Hotel/Base in Las Vegas",
+          "to": "Lotus of Siam or Dinner Spot",
+          "mode": "car",
+          "estimatedDurationMinutes": 10,
+          "estimatedDistanceKm": 4
+        },
+        {
+          "from": "Dinner Spot",
+          "to": "Strip (for final stroll)",
+          "mode": "car or rideshare",
+          "estimatedDurationMinutes": 10,
+          "estimatedDistanceKm": 3
+        },
+        {
+          "from": "Strip",
+          "to": "Hotel/Base in Las Vegas",
+          "mode": "walking or short drive",
+          "estimatedDurationMinutes": 10,
+          "estimatedDistanceKm": 1.5
+        }
+      ]
+    }
+  ],
+  "notes": {
+    "general": [
+      "This 3‑day plan assumes you are staying in Las Vegas and have access to a car for day trips and cross‑town rides.",
+      "Times are approximate and can be shifted earlier or later by 1–2 hours based on your preference.",
+      "All outdoor activities (Red Rock Canyon and Seven Magic Mountains) are weather‑dependent; in December, expect cooler temperatures, especially in the morning and evening."
+    ],
+    "bookingSuggestions": [
+      "Consider reserving popular restaurants (Eggslut, Mon Ami Gabi, Lotus of Siam) in advance, especially for prime time slots.",
+      "For the High Roller, you can buy tickets in advance online or at the LINQ box office; sunset and evening rides are most popular.",
+      "If you want to add a big Vegas show one night, you can slot it in after dinner on Day 1 or Day 2 near your chosen resort."
+    ]
+  }
+}
