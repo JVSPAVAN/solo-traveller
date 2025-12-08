@@ -5,8 +5,9 @@ import { login as apiLogin, register as apiRegister } from '../../services/authS
 const AuthModal = ({ show, onClose, onLoginSuccess }) => {
     const { login } = useApp();
     const [isLoginMode, setIsLoginMode] = useState(true);
-    const [email, setEmail] = useState('demo@solotraveller.com');
-    const [password, setPassword] = useState('password123');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -47,7 +48,31 @@ const AuthModal = ({ show, onClose, onLoginSuccess }) => {
                     <input type="text" className="auth-input" placeholder="Full Name" />
                 )}
                 <input type="email" className="auth-input" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} />
-                <input type="password" className="auth-input" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+
+                <div style={{ position: 'relative' }}>
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        className="auth-input"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        style={{ paddingRight: '40px' }}
+                    />
+                    <i
+                        className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
+                        style={{
+                            position: 'absolute',
+                            right: '15px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            cursor: 'pointer',
+                            color: '#aaa',
+                            fontSize: '0.9rem'
+                        }}
+                        onClick={() => setShowPassword(!showPassword)}
+                    ></i>
+                </div>
+
                 {!isLoginMode && (
                     <input type="password" className="auth-input" placeholder="Confirm Password" />
                 )}
