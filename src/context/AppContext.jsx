@@ -1,5 +1,6 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { getCurrentUser, logout as authLogout } from '../services/authService';
+import { getTrips, createTrip } from '../services/tripService';
 
 const AppContext = createContext();
 
@@ -7,21 +8,32 @@ export const AppProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [user, setUser] = useState(null); // { name: "John Doe", email: "..." }
     const [currentTripData, setCurrentTripData] = useState(null);
-    const [myTrips, setMyTrips] = useState([
-        { title: "Tokyo Adventure", date: "Apr 2024 • 10 Days", img: "https://images.unsplash.com/photo-1496417263034-38ec4f0d6b21?w=500", isUpcoming: false },
-        { title: "Paris Getaway", date: "Sep 2023 • 5 Days", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=500", isUpcoming: false }
-    ]);
+    const [myTrips, setMyTrips] = useState([]);
     const [userPlan, setUserPlan] = useState('free'); // 'free', 'standard', 'pro'
     const [theme, setTheme] = useState('light');
 
     // Initialize user
-    React.useEffect(() => {
+    useEffect(() => {
         const currentUser = getCurrentUser();
         if (currentUser) {
             setIsLoggedIn(true);
             setUser(currentUser.user);
+            setUserPlan(currentUser.user.plan || 'free'); // Init plan
         }
     }, []);
+
+    // Fetch trips when logged in
+    useEffect(() => {
+        if (isLoggedIn) {
+            getTrips()
+                .then(data => {
+                    setMyTrips(data);
+                })
+                .catch(err => console.error("Failed to load trips", err));
+        } else {
+            setMyTrips([]);
+        }
+    }, [isLoggedIn]);
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -32,16 +44,39 @@ export const AppProvider = ({ children }) => {
     const login = (userData) => {
         setIsLoggedIn(true);
         setUser(userData.user);
+        setUserPlan(userData.user.plan || 'free');
     };
 
     const logout = () => {
         authLogout();
         setIsLoggedIn(false);
         setUser(null);
+        setMyTrips([]);
     };
 
-    const saveTrip = (trip) => {
-        setMyTrips(prev => [{ ...trip, date: "New Trip • 7 Days", img: "https://images.unsplash.com/photo-1474044159687-1ee9f86ac5f4?w=500", isUpcoming: true }, ...prev]);
+    const saveTrip = async (trip) => {
+        // Adapt frontend trip object to backend schema
+        const tripPayload = {
+            destination: trip.title || "Untitled Trip",
+            start_date: trip.startDate || new Date(),
+            end_date: trip.endDate || new Date(),
+            notes: trip.notes || ""
+        };
+
+        try {
+            const savedTrip = await createTrip(tripPayload);
+            // Format for frontend
+            const formattedTrip = {
+                ...savedTrip,
+                title: savedTrip.destination,
+                date: new Date(savedTrip.start_date || Date.now()).toLocaleDateString(),
+                img: "https://images.unsplash.com/photo-1474044159687-1ee9f86ac5f4?w=500", // Placeholder
+                isUpcoming: true
+            };
+            setMyTrips(prev => [formattedTrip, ...prev]);
+        } catch (error) {
+            console.error("Failed to save trip", error);
+        }
     };
 
     const fetchPlaceCardData = async (placeId, placeName) => {

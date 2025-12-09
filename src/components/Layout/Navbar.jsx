@@ -1,6 +1,5 @@
-import React from 'react';
+import Logo from '../Shared/Logo';
 import { useApp } from '../../context/AppContext';
-
 
 const Navbar = ({ onOpenAuth, onOpenTemplate, onSwitchView, onOpenGeneric }) => {
     const { isLoggedIn, user, theme, toggleTheme, logout, myTrips, userPlan } = useApp();
@@ -14,8 +13,8 @@ const Navbar = ({ onOpenAuth, onOpenTemplate, onSwitchView, onOpenGeneric }) => 
 
     return (
         <nav className="top-navbar">
-            <div className="logo" onClick={() => onSwitchView('landing')}>
-                <i className="fa-solid fa-route nav-logo-pulse"></i> SoloTraveller
+            <div className="logo" onClick={() => onSwitchView('landing')} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Logo width="28px" height="28px" className="nav-logo-pulse" /> SoloTraveller
             </div>
             <div className="nav-right">
                 <label className="theme-switch">

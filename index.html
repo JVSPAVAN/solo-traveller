@@ -4,12 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SoloTraveller</title>
-    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://js.stripe.com">
+    <link rel="dns-prefetch" href="https://js.stripe.com">
+    <script async src="https://js.stripe.com/v3/buy-button.js"></script>
 
     <style>
       :root {
-        --primary-orange: #fa4d4d;
+        --primary-orange: #f05c5c;
       }
       body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
       #splash-screen {
@@ -24,37 +27,14 @@
       .brand-svg {
         width: 120px;
         height: 120px;
-        overflow: visible;
-      }
-
-      /* Markers */
-      .marker-path {
         fill: var(--primary-orange);
-        transform-origin: center bottom;
-      }
-      
-      .marker-start {
-        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        transform-box: fill-box;
-      }
-      
-      .marker-end {
-        opacity: 0;
-        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        animation-delay: 1.4s;
-        transform-box: fill-box;
+        animation: pulse 2s infinite ease-in-out;
       }
 
-      /* Connecting Line */
-      .route-line {
-        fill: none;
-        stroke: var(--primary-orange);
-        stroke-width: 8;
-        stroke-linecap: round;
-        stroke-dasharray: 160;
-        stroke-dashoffset: 160;
-        animation: drawLine 1s ease-in-out forwards;
-        animation-delay: 0.5s;
+      @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
       }
 
       /* Text */
@@ -66,18 +46,9 @@
         opacity: 0;
         transform: translateY(10px);
         animation: fadeUp 0.8s ease-out forwards;
-        animation-delay: 1.8s;
+        animation-delay: 0.5s;
       }
-
-      @keyframes popIn {
-        0% { transform: scale(0); opacity: 0; }
-        100% { transform: scale(1); opacity: 1; }
-      }
-
-      @keyframes drawLine {
-        to { stroke-dashoffset: 0; }
-      }
-
+      
       @keyframes fadeUp {
         to { opacity: 1; transform: translateY(0); }
       }
@@ -91,7 +62,7 @@
         position: relative;
         opacity: 0;
         animation: fadeIn 0.5s forwards;
-        animation-delay: 2s;
+        animation-delay: 0.8s;
       }
       @keyframes fadeIn { to { opacity: 1; } }
       .splash-loader::after { content: ''; position: absolute; width: 0%; height: 100%; background: var(--primary-orange); animation: loadBar 2s ease-in-out forwards; }
@@ -99,21 +70,9 @@
   </head>
   <body>
     <div id="splash-screen">
-      <!-- Custom SVG Logo Animation mimicking fa-route -->
-      <svg class="brand-svg" viewBox="0 0 100 100">
-        <!-- Marker 1 (Start - Bottom Leftish) -->
-        <path class="marker-path marker-start" d="M30,60 C15,60 15,35 30,35 C45,35 45,60 30,60 L30,60 Z" transform="translate(0, -10)" />
-        
-        <!-- Connecting Line (Curved from Marker 1 bottom to Marker 2 bottom) -->
-        <!-- Path starts at 30,50 (tip of marker 1 approx) and goes to 70,30 (tip of marker 2) -->
-        <!-- Actually marker tip is center bottom. Let's say center of circle is 30,45. Tip is 30,60. -->
-        <!-- We want line from 30,60 to 70,40? No, fa-route is typically side by side or diagonal. -->
-        <!-- Let's do a nice curve. Start 30,50 -> End 70,30 -->
-        <path class="route-line" d="M30,50 Q50,80 70,30" />
-        
-        <!-- Marker 2 (End - Top Rightish) -->
-        <!-- Center roughly at 70, 15 -->
-        <path class="marker-path marker-end" d="M70,40 C55,40 55,15 70,15 C85,15 85,40 70,40 L70,40 Z" transform="translate(0, -10)" />
+      <!-- New SVG Logo -->
+      <svg class="brand-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+        <path d="M576 160C576 210.2 516.9 285.1 491.4 315C487.6 319.4 482 321.1 476.9 320L384 320C366.3 320 352 334.3 352 352C352 369.7 366.3 384 384 384L480 384C533 384 576 427 576 480C576 533 533 576 480 576L203.6 576C212.3 566.1 222.9 553.4 233.6 539.2C239.9 530.8 246.4 521.6 252.6 512L480 512C497.7 512 512 497.7 512 480C512 462.3 497.7 448 480 448L384 448C331 448 288 405 288 352C288 299 331 256 384 256L423.8 256C402.8 224.5 384 188.3 384 160C384 107 427 64 480 64C533 64 576 107 576 160zM181.1 553.1C177.3 557.4 173.9 561.2 171 564.4L169.2 566.4L169 566.2C163 570.8 154.4 570.2 149 564.4C123.8 537 64 466.5 64 416C64 363 107 320 160 320C213 320 256 363 256 416C256 446 234.9 483 212.5 513.9C201.8 528.6 190.8 541.9 181.7 552.4L181.1 553.1zM192 416C192 398.3 177.7 384 160 384C142.3 384 128 398.3 128 416C128 433.7 142.3 448 160 448C177.7 448 192 433.7 192 416zM480 192C497.7 192 512 177.7 512 160C512 142.3 497.7 128 480 128C462.3 128 448 142.3 448 160C448 177.7 462.3 192 480 192z"/>
       </svg>
       
       <div class="splash-text">SoloTraveller</div>

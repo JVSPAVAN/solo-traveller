@@ -55,10 +55,18 @@ function App() {
   const [genericType, setGenericType] = useState(null);
   const [reservationType, setReservationType] = useState(null);
   const [paymentPlan, setPaymentPlan] = useState({ name: '', price: '' });
+  const [templateDefaultMode, setTemplateDefaultMode] = useState('template');
 
   const showToast = (message, type = 'info') => {
     setToast({ show: true, message, type });
   };
+
+  const handleOpenTemplate = (mode = 'template') => {
+    setTemplateDefaultMode(mode);
+    toggleModal('planType', false);
+    toggleModal('template', true);
+  };
+
 
   const triggerConfetti = () => {
     setShowConfetti(true);
@@ -273,13 +281,14 @@ function App() {
         show={modals.planType}
         onClose={() => toggleModal('planType', false)}
         onStartManual={handleStartManual}
-        onOpenTemplate={() => { toggleModal('planType', false); toggleModal('template', true); }}
-        onUpgrade={() => { toggleModal('planType', false); setPaymentPlan({ name: 'Standard', price: '$10/mo' }); toggleModal('payment', true); }}
+        onOpenTemplate={handleOpenTemplate}
+        onUpgrade={() => { toggleModal('planType', false); setPaymentPlan({ name: 'Standard', price: '$10' }); toggleModal('payment', true); }}
       />
       <TemplateModal
         show={modals.template}
         onClose={() => toggleModal('template', false)}
         onGenerate={handleTemplateGenerate}
+        initialMode={templateDefaultMode}
       />
       <PaymentModal
         isOpen={modals.payment}

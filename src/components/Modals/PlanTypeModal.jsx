@@ -12,7 +12,7 @@ const PlanTypeModal = ({ show, onClose, onStartManual, onOpenTemplate, onUpgrade
 
     return (
         <div className="modal-overlay active" id="planTypeModal" onClick={(e) => e.target.id === 'planTypeModal' && onClose()}>
-            <div className="modal-box" style={{ width: '500px' }}>
+            <div className="modal-box" style={{ width: '800px', maxWidth: '95vw' }}>
                 <span className="close-auth" onClick={onClose}>&times;</span>
                 <div className="modal-title">Start Planning</div>
                 <p style={{ fontSize: '0.9rem', color: 'var(--text-light)' }}>How would you like to begin your adventure?</p>
@@ -32,21 +32,26 @@ const PlanTypeModal = ({ show, onClose, onStartManual, onOpenTemplate, onUpgrade
                                 <div className="plan-title">Start from Scratch</div>
                                 <div className="plan-desc">Build your itinerary day by day manually.</div>
                             </div>
-                            <div className="plan-card-option" onClick={onOpenTemplate}>
-                                <div className="plan-icon"><i className="fa-solid fa-wand-magic-sparkles"></i></div>
+                            <div className="plan-card-option" onClick={() => onOpenTemplate('template')}>
+                                <div className="plan-icon"><i className="fa-solid fa-list-check"></i></div>
                                 <div className="plan-title">Use Template</div>
-                                <div className="plan-desc">Auto-generate a plan based on popular routes.</div>
+                                <div className="plan-desc">Modify a pre-built popular itinerary.</div>
+                            </div>
+                            <div className="plan-card-option" onClick={() => onOpenTemplate('ai')}>
+                                <div className="plan-icon"><i className="fa-solid fa-wand-magic-sparkles"></i></div>
+                                <div className="plan-title">Plan with AI</div>
+                                <div className="plan-desc">Auto-generate a custom plan in seconds.</div>
                             </div>
                         </>
                     )}
-                </div>
+                </div >
                 {isFree && !limitReached && (
                     <div style={{ textAlign: 'center', marginTop: '15px', fontSize: '0.85rem', color: 'var(--text-light)' }}>
                         Free Plan Usage: <b>{tripCount} / {limit}</b> trips
                     </div>
                 )}
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

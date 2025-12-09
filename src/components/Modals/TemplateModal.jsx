@@ -3,9 +3,16 @@ import { detailedItineraryData, parseTextToData, parseUserJsonToTripData, parseA
 import userTripData from '../../data/userTrip.json';
 import { useApp } from '../../context/AppContext';
 
-const TemplateModal = ({ show, onClose, onGenerate }) => {
+const TemplateModal = ({ show, onClose, onGenerate, initialMode = 'template' }) => {
     const { setCurrentTripData } = useApp();
     const [mode, setMode] = useState('template'); // 'template' or 'ai'
+
+    // Sync mode when modal opens
+    React.useEffect(() => {
+        if (show) {
+            setMode(initialMode);
+        }
+    }, [show, initialMode]);
     const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
     const [templateText, setTemplateText] = useState(`Trip Name: Southwest Red Rock Loop (25-30s Edit)
 Dates: 7 Days
@@ -259,13 +266,6 @@ Note: Return rental car. Fly back to BDL.`);
         }
     };
 
-    const handleLoadUserTrip = () => {
-        const data = parseUserJsonToTripData(userTripData);
-        setCurrentTripData(data);
-        onGenerate();
-        onClose();
-    };
-
     return (
         <div className="modal-overlay active" id="templateModal" onClick={(e) => e.target.id === 'templateModal' && onClose()}>
             <div className="modal-box">
@@ -360,11 +360,6 @@ Note: Return rental car. Fly back to BDL.`);
                     <button className="btn-generate" onClick={handleGenerate} disabled={isLoading}>
                         {isLoading ? 'Generating...' : 'Generate Itinerary'}
                     </button>
-                    {mode === 'template' && (
-                        <button className="btn-generate" style={{ background: '#4285F4', marginLeft: '10px' }} onClick={handleLoadUserTrip}>
-                            Load User JSON Trip
-                        </button>
-                    )}
                 </div>
 
                 {isLoading && (

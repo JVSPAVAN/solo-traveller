@@ -751,7 +751,7 @@ input:checked+.slider:before {
 .pro-icon {
   font-size: 1.5rem;
   margin-bottom: 20px;
-  color: var(--primary-main);
+  color: var(--primary-orange);
 }
 
 .pro-card h3 {
@@ -1028,12 +1028,20 @@ input:checked+.slider:before {
 
 .payment-modal-v2 {
   background: white;
-  width: 400px;
+  width: 800px;
+  /* Increased from 400px */
+  max-width: 95vw;
   padding: 30px;
   border-radius: 16px;
   position: relative;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   display: block;
+}
+
+[data-theme="dark"] .payment-modal-v2 {
+  background: var(--bg-card);
+  /* Dark mode support */
+  border: 1px solid var(--border-color);
 }
 
 .close-modal-btn {
@@ -2739,7 +2747,7 @@ details.faq-item p {
 /* Plan Type Selection Modal */
 .plan-type-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-top: 20px;
 }

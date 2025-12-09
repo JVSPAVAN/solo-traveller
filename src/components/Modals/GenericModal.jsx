@@ -1,12 +1,9 @@
+import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { updateProfile } from '../../services/authService';
 
 const GenericModal = ({ show, onClose, type, onSimulateAction }) => {
     const { user, login } = useApp(); // login updates the context state
-    if (!show) return null;
-
-    let title = "Title";
-    let content = null;
 
     const [isEditing, setIsEditing] = React.useState(false);
     // Local state for form fields
@@ -32,28 +29,19 @@ const GenericModal = ({ show, onClose, type, onSimulateAction }) => {
     const handleSave = async () => {
         try {
             await updateProfile(formData);
-            // Context update happens via localStorage listener or manual refresh? 
-            // authService updates localStorage. Let's force context refresh if possible.
-            // Actually, best way is to manually update user in context if method exists.
-            // `login` function in AppContext usually setsUser. We can re-use it.
-            // But we need the full user object. authService.updateProfile returns the updated user object?
-            // Yes, backend returns user.
-            // Wait, backend returns "user". Let's check authController.
-            // authController returns result of authService.updateProfile which is the User document.
-
-            // We need to merge with token if we use `login`.
-            // Actually, authService updates localStorage. AppContext might not react unless we call something.
-            // Let's assume onSimulateAction shows success and next reload shows data, 
-            // OR we can hack it by calling login() with updated data if we have token.
-            // Let's just rely on authService updating localStorage for now + reload or notify.
             onSimulateAction('Profile updated successfully!');
             setIsEditing(false);
-            window.location.reload(); // Simple way to refresh context for now without refactoring AppContext
+            window.location.reload();
         } catch (err) {
             console.error(err);
             alert("Failed to update profile");
         }
     };
+
+    if (!show) return null;
+
+    let title = "Title";
+    let content = null;
 
     if (type === 'account') {
         title = (

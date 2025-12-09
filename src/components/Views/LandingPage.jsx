@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import PaymentModal from '../Shared/PaymentModal';
+import React, { useState } from 'react';
+import Logo from '../Shared/Logo';
 import { useApp } from '../../context/AppContext';
 
 const LandingPage = ({ onStartPlanning, onOpenGeneric, onOpenAuth, onOpenPayment }) => {
@@ -36,7 +36,9 @@ const LandingPage = ({ onStartPlanning, onOpenGeneric, onOpenAuth, onOpenPayment
                 <div className="landing-nav-spacer" style={{ height: '60px' }}></div>
                 <div className="hero-section">
                     <div className="landing-card">
-                        <div className="landing-logo"><i className="fa-solid fa-route"></i> SoloTraveller</div>
+                        <div className="landing-logo" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px' }}>
+                            <Logo width="60px" height="60px" /> SoloTraveller
+                        </div>
                         <div className="landing-tagline">Plan your best trip ever.</div>
                         <p className="landing-desc">Build a complete itinerary in seconds. Import reservations, drag-and-drop stops, and collaborate.</p>
                         <button className="btn-start-hero" onClick={onStartPlanning}>Start Planning</button>
@@ -139,7 +141,7 @@ const LandingPage = ({ onStartPlanning, onOpenGeneric, onOpenAuth, onOpenPayment
                             <div className="pricing-card">
                                 <div className="pricing-header">
                                     <h3>Free</h3>
-                                    <div className="price">$0<span>/mo</span></div>
+                                    <div className="price">$0</div>
                                 </div>
                                 <ul className="pricing-features">
                                     <li><i className="fa-solid fa-check"></i> 5 Itineraries</li>
@@ -152,19 +154,19 @@ const LandingPage = ({ onStartPlanning, onOpenGeneric, onOpenAuth, onOpenPayment
                                 <div className="tag-popular">Most Popular</div>
                                 <div className="pricing-header">
                                     <h3>Standard</h3>
-                                    <div className="price">$10<span>/mo</span></div>
+                                    <div className="price">$10</div>
                                 </div>
                                 <ul className="pricing-features">
                                     <li><i className="fa-solid fa-check"></i> 10 Monthly Plans</li>
                                     <li><i className="fa-solid fa-check"></i> Email scanning</li>
                                     <li><i className="fa-solid fa-check"></i> Offline access</li>
                                 </ul>
-                                <button className="btn-price fill" onClick={() => openPayment('Standard', '$10/mo')}>Choose Standard</button>
+                                <button className="btn-price fill" onClick={() => openPayment('Standard', '$10')}>Choose Standard</button>
                             </div>
                             <div className="pricing-card">
                                 <div className="pricing-header">
                                     <h3>Pro</h3>
-                                    <div className="price">$20<span>/mo</span></div>
+                                    <div className="price">$20</div>
                                 </div>
                                 <ul className="pricing-features">
                                     <li><i className="fa-solid fa-check"></i> Unlimited Plans</li>
@@ -172,13 +174,12 @@ const LandingPage = ({ onStartPlanning, onOpenGeneric, onOpenAuth, onOpenPayment
                                     <li><i className="fa-solid fa-check"></i> Export to Google Maps</li>
                                     <li><i className="fa-solid fa-check"></i> Priority Support</li>
                                 </ul>
-                                <button className="btn-price outline" onClick={() => openPayment('Pro', '$20/mo')}>Choose Pro</button>
+                                <button className="btn-price outline" onClick={() => openPayment('Pro', '$20')}>Choose Pro</button>
                             </div>
                         </div>
                     </div>
                     {/* ... footer ... */}
                     <footer className="main-footer">
-                        {/* Footer content */}
                         <div className="footer-content">
                             <div className="footer-col" style={{ flex: 1.5 }}>
                                 <h4 style={{ color: 'var(--primary-orange)', display: 'flex', alignItems: 'center', gap: '8px' }}><i className="fa-solid fa-route"></i> SoloTraveller</h4>
