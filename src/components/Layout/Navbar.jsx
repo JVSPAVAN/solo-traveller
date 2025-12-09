@@ -25,7 +25,7 @@ const Navbar = ({ onOpenAuth, onOpenTemplate, onSwitchView, onOpenGeneric }) => 
                         <i className="fa-solid fa-moon"></i>
                     </span>
                 </label>
-                <button className="btn-template" onClick={onOpenTemplate}>
+                <button className="btn-template" onClick={() => isLoggedIn ? onOpenTemplate() : onOpenAuth()}>
                     <i className="fa-solid fa-wand-magic-sparkles"></i> Use Template
                 </button>
                 <div className="user-container">

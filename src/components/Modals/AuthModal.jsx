@@ -5,6 +5,7 @@ import { login as apiLogin, register as apiRegister } from '../../services/authS
 const AuthModal = ({ show, onClose, onLoginSuccess }) => {
     const { login } = useApp();
     const [isLoginMode, setIsLoginMode] = useState(true);
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +24,7 @@ const AuthModal = ({ show, onClose, onLoginSuccess }) => {
                 onLoginSuccess("Successfully signed in.");
                 onClose();
             } else {
-                await apiRegister(email, password);
+                await apiRegister(name, email, password);
                 // Auto login after register? Or ask to login?
                 // For now, let's ask to sign in or auto-login if token provided (it's not).
                 // Let's just switch to login mode and fill creds
@@ -45,7 +46,7 @@ const AuthModal = ({ show, onClose, onLoginSuccess }) => {
                 <p style={{ marginBottom: '20px', fontSize: '0.9rem', color: 'var(--text-light)' }}>Access your trips and budget.</p>
                 {error && <p style={{ color: 'red', fontSize: '0.8rem', marginBottom: '10px' }}>{error}</p>}
                 {!isLoginMode && (
-                    <input type="text" className="auth-input" placeholder="Full Name" />
+                    <input type="text" className="auth-input" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} />
                 )}
                 <input type="email" className="auth-input" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} />
 

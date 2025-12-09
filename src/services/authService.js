@@ -82,21 +82,43 @@ export const login = async (email, password) => {
   }
 };
 
-export const register = async (email, password) => {
+export const register = async (name, email, password) => {
   try {
     const encryptedPassword = await encryptPassword(password);
     const response = await axios.post(`${API_URL}/register`, {
+      name,
       email,
       encryptedPassword,
     });
-    // Register usually returns { id, email } but no token (unless we change backend).
-    // If backend doesn't return token on register, user needs to login.
-    // Let's check backend: authService.js register returns { id, email }.
+    // Register usually returns { id, email, name }.
     return response.data;
   } catch (error) {
     console.error('Register error:', error);
     throw error;
   }
+};
+
+export const updateProfile = async (userData) => {
+    try {
+        const currentUser = getCurrentUser();
+        const token = currentUser?.token;
+        if (!token) throw new Error("No token found");
+
+        const response = await axios.put(`${API_URL}/profile`, userData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        // Update local storage user data
+        if (currentUser && currentUser.user) {
+             const updatedUser = { ...currentUser, user: { ...currentUser.user, ...response.data } };
+             localStorage.setItem('user', JSON.stringify(updatedUser));
+        }
+        
+        return response.data;
+    } catch (error) {
+        console.error("Profile update error:", error);
+        throw error;
+    }
 };
 
 export const logout = () => {
