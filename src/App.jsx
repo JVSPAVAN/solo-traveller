@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useJsApiLoader } from '@react-google-maps/api';
 import { useApp } from './context/AppContext';
 import Navbar from './components/Layout/Navbar'; // Restored
 import NavSidebar from './components/Layout/NavSidebar';
@@ -21,8 +22,16 @@ import PlanTypeModal from './components/Modals/PlanTypeModal';
 import TemplateModal from './components/Modals/TemplateModal';
 import PaymentModal from './components/Shared/PaymentModal';
 
+const libraries = ['geometry', 'places'];
+
 function App() {
   const { isLoggedIn, currentTripData, setCurrentTripData, fetchPlaceCardData } = useApp();
+
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: "AIzaSyCmHV3xkO2aRDnuNUB-4nyLjeDT123_lbI",
+    libraries
+  });
 
   // Splash Screen Logic
   useEffect(() => {
@@ -182,6 +191,8 @@ function App() {
     }
   };
 
+  // Mobile View Toggle State
+  const [mobileViewMode, setMobileViewMode] = useState('list'); // 'list' or 'map'
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   return (
@@ -221,31 +232,59 @@ function App() {
 
             {/* Content Area (Sidebar + Map) */}
             <div className="main-container" style={{ height: '100%', width: '100%', flex: 1, display: 'flex' }}>
-              <Sidebar className={isSidebarCollapsed ? 'expanded-width' : ''}>
-                {activeView === 'itinerary' && (
-                  <ItineraryView
-                    onOpenReservation={(type) => { setReservationType(type); toggleModal('reservation', true); }}
-                    onOpenShare={() => toggleModal('share', true)}
-                    onOpenInvite={() => { setGenericType('friends'); toggleModal('generic', true); }}
-                    onMarkerClick={handleMarkerClick}
-                    onShowRoute={handleShowRoute}
-                    expandedDay={expandedDay}
-                  />
-                )}
-                {activeView === 'explore' && <TripsView />}
-                {activeView === 'budget' && <BudgetView onAddExpense={() => showToast('Expense added successfully!', 'success')} />}
-                {['notes', 'places'].includes(activeView) && <div style={{ padding: '20px' }}>Placeholder for {activeView}</div>}
-              </Sidebar>
-              <MapView
-                activeView={activeView}
-                currentTripData={currentTripData}
-                mapCenter={mapCenter}
-                mapZoom={mapZoom}
-                onMarkerClick={handleMarkerClick}
-                activeRoute={activeRoute}
-                selectedMarkerId={selectedMarkerId}
-                onNavigate={handleNavigate}
-              />
+
+              {/* Sidebar Container */}
+              <div className={`sidebar-wrapper ${mobileViewMode === 'map' ? 'mobile-hidden' : ''}`} style={{ display: 'contents' }}>
+                <Sidebar className={isSidebarCollapsed ? 'expanded-width' : ''}>
+                  {activeView === 'itinerary' && (
+                    <ItineraryView
+                      onOpenReservation={(type) => { setReservationType(type); toggleModal('reservation', true); }}
+                      onOpenShare={() => toggleModal('share', true)}
+                      onOpenInvite={() => { setGenericType('friends'); toggleModal('generic', true); }}
+                      onMarkerClick={handleMarkerClick}
+                      onShowRoute={handleShowRoute}
+                      expandedDay={expandedDay}
+                    />
+                  )}
+                  {activeView === 'explore' && <TripsView />}
+                  {activeView === 'budget' && <BudgetView onAddExpense={() => showToast('Expense added successfully!', 'success')} />}
+                  {['notes', 'places'].includes(activeView) && <div style={{ padding: '20px' }}>Placeholder for {activeView}</div>}
+                </Sidebar>
+              </div>
+
+              {/* Map Container Wrapper */}
+              <div className={`map-wrapper ${mobileViewMode === 'list' && activeView === 'itinerary' ? 'mobile-hidden' : ''}`} style={{ flex: 1, position: 'relative', height: '100%' }}>
+                <MapView
+                  activeView={activeView}
+                  currentTripData={currentTripData}
+                  mapCenter={mapCenter}
+                  mapZoom={mapZoom}
+                  onMarkerClick={handleMarkerClick}
+                  activeRoute={activeRoute}
+                  selectedMarkerId={selectedMarkerId}
+                  onNavigate={handleNavigate}
+                  isLoaded={isLoaded}
+                />
+              </div>
+
+              {/* Mobile View Toggle Buttons (Floating) - Only active in Itinerary View */}
+              {activeView === 'itinerary' && (
+                <div className="mobile-view-toggle">
+                  <button
+                    className={`toggle-bubble-btn ${mobileViewMode === 'list' ? 'active' : ''}`}
+                    onClick={() => setMobileViewMode('list')}
+                  >
+                    <i className="fa-solid fa-list-ul"></i>
+                  </button>
+                  <button
+                    className={`toggle-bubble-btn ${mobileViewMode === 'map' ? 'active' : ''}`}
+                    onClick={() => setMobileViewMode('map')}
+                  >
+                    <i className="fa-solid fa-map-location-dot"></i>
+                  </button>
+                </div>
+              )}
+
             </div>
           </>
         )}
@@ -289,6 +328,7 @@ function App() {
         onClose={() => toggleModal('template', false)}
         onGenerate={handleTemplateGenerate}
         initialMode={templateDefaultMode}
+        isLoaded={isLoaded}
       />
       <PaymentModal
         isOpen={modals.payment}

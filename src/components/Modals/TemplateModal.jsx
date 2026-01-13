@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { Autocomplete } from '@react-google-maps/api';
 import { detailedItineraryData, parseTextToData, parseUserJsonToTripData, parseAiResponseToTripData, mergeDistancesToTripData, PLACE_COORDINATES } from '../../utils/itineraryParser';
 import userTripData from '../../data/userTrip.json';
 import { useApp } from '../../context/AppContext';
 
-const TemplateModal = ({ show, onClose, onGenerate, initialMode = 'template' }) => {
+const TemplateModal = ({ show, onClose, onGenerate, initialMode = 'template', isLoaded }) => {
     const { setCurrentTripData } = useApp();
+    const autocompleteRef = React.useRef(null);
     const [mode, setMode] = useState('template'); // 'template' or 'ai'
 
     // Sync mode when modal opens
@@ -14,6 +16,69 @@ const TemplateModal = ({ show, onClose, onGenerate, initialMode = 'template' }) 
         }
     }, [show, initialMode]);
     const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+
+    // Hacky way to inject 'State' pill into Google's dropdown since we can't easily style it with CSS alone based on content
+    React.useEffect(() => {
+        if (!isLoaded || mode !== 'ai') return;
+
+        const observer = new MutationObserver((mutations) => {
+            const pacContainers = document.querySelectorAll('.pac-container');
+            pacContainers.forEach(container => {
+                const items = container.querySelectorAll('.pac-item');
+                items.forEach(item => {
+                    if (item.getAttribute('data-pill-processed')) return;
+
+                    const query = item.querySelector('.pac-item-query');
+                    if (query) {
+                        const text = query.textContent.trim();
+                        // List of US States
+                        const states = [
+                            "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+                            "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",
+                            "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
+                            "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
+                            "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
+                        ];
+
+                        if (states.includes(text)) {
+                            // Robust check for secondary text (usually the country for states)
+                            // Use nextSibling if available to inspect specific secondary span
+                            let isState = false;
+
+                            // Check DOM structure: query span + secondary span
+
+                            if (query.nextSibling && query.nextSibling.textContent) {
+                                const secondaryContent = query.nextSibling.textContent.trim();
+                                if (!secondaryContent || secondaryContent === "USA" || secondaryContent === "United States") {
+                                    isState = true;
+                                }
+                            } else {
+                                // Fallback to text content replacement method
+                                const fullText = item.textContent || "";
+                                const secondaryText = fullText.replace(text, "").trim().replace(/^,/, "").trim();
+                                // If secondary text is empty/falsy, it's likely the state itself (e.g. "Nevada" with no "MO" suffix)
+                                if (!secondaryText || secondaryText === "USA" || secondaryText === "United States") {
+                                    isState = true;
+                                }
+                            }
+
+                            if (isState) {
+                                const span = document.createElement('span');
+                                span.className = 'state-pill';
+                                span.textContent = 'State';
+                                item.appendChild(span); // Append to the item item container, not query text
+                            }
+                        }
+                    }
+                    item.setAttribute('data-pill-processed', 'true');
+                });
+            });
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        return () => observer.disconnect();
+    }, [isLoaded, mode]);
     const [templateText, setTemplateText] = useState(`Trip Name: Southwest Red Rock Loop (25-30s Edit)
 Dates: 7 Days
 Day 1: Arrival & The Strip
@@ -304,31 +369,58 @@ Note: Return rental car. Fly back to BDL.`);
                         <>
                             <div className="form-group" style={{ position: 'relative' }}>
                                 <label>Places to Visit</label>
-                                <div className="input-with-icon">
-                                    <input
-                                        type="text"
-                                        className="modern-input"
-                                        placeholder="e.g. Las Vegas"
-                                        value={currentPlaceInput}
-                                        onChange={handleInputChange}
-                                        onKeyDown={handleKeyDown}
-                                        onBlur={handleBlur}
-                                        onFocus={handleFocus}
-                                    />
-                                    <button className="input-icon-btn" onClick={handleAddPlace}>
-                                        <i className="fa-solid fa-plus"></i>
-                                    </button>
-                                </div>
-
-                                {showDropdown && filteredSuggestions.length > 0 && (
-                                    <ul className="suggestions-dropdown">
-                                        {filteredSuggestions.map((place, index) => (
-                                            <li key={index} className="suggestion-item" onClick={() => handleSelectSuggestion(place)}>
-                                                <i className="fa-solid fa-location-dot" style={{ marginRight: '8px', color: '#ccc' }}></i>
-                                                {place}
-                                            </li>
-                                        ))}
-                                    </ul>
+                                {isLoaded ? (
+                                    <Autocomplete
+                                        onLoad={(autocomplete) => {
+                                            autocompleteRef.current = autocomplete;
+                                        }}
+                                        onPlaceChanged={() => {
+                                            if (autocompleteRef.current) {
+                                                const place = autocompleteRef.current.getPlace();
+                                                if (place.formatted_address) {
+                                                    if (!selectedPlaces.includes(place.formatted_address)) {
+                                                        setSelectedPlaces([...selectedPlaces, place.formatted_address]);
+                                                    }
+                                                    setCurrentPlaceInput('');
+                                                } else if (place.name) {
+                                                    if (!selectedPlaces.includes(place.name)) {
+                                                        setSelectedPlaces([...selectedPlaces, place.name]);
+                                                    }
+                                                    setCurrentPlaceInput('');
+                                                }
+                                            }
+                                        }}
+                                        restrictions={{ country: "us" }}
+                                    // types={['(cities)']} // Removed to allow states/regions too
+                                    >
+                                        <div className="input-with-icon">
+                                            <input
+                                                type="text"
+                                                className="modern-input"
+                                                placeholder="e.g. Las Vegas, NV"
+                                                value={currentPlaceInput}
+                                                onChange={(e) => setCurrentPlaceInput(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                        // Autocomplete usually handles enter if an item is focused.
+                                                        // If just text entered, we might want to let it pass or block.
+                                                        // With Autocomplete, Enter on selection triggers onPlaceChanged.
+                                                    }
+                                                }}
+                                            />
+                                            {/* Retain the plus button if they want to force add manual text? 
+                                                 Google Autocomplete usually clears input on selection? 
+                                                 Actually, we want to clear input after selection.
+                                                 If they just type text and hit enter, Autocomplete doesn't trigger onPlaceChanged unless they selected.
+                                                 For now, let's keep the standard behavior. Manual add is slightly risky with AI if place is ambiguous.
+                                             */}
+                                        </div>
+                                    </Autocomplete>
+                                ) : (
+                                    <div className="input-with-icon">
+                                        <input type="text" className="modern-input" placeholder="Loading location search..." disabled />
+                                    </div>
                                 )}
 
                                 <div className="places-capsules-container">

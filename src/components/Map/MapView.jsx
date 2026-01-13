@@ -1,10 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import { GoogleMap, useJsApiLoader, Polyline, OverlayView, Rectangle } from '@react-google-maps/api';
+import { GoogleMap, Polyline, OverlayView, Rectangle } from '@react-google-maps/api';
 import PlacePopup from './PlacePopup';
 import { useApp } from '../../context/AppContext';
-
-// Libraries to load from Google Maps API
-const libraries = ['geometry', 'places'];
 
 const containerStyle = {
     width: '100%',
@@ -78,7 +75,7 @@ function decodePolyline(encoded) {
 
 const MapLegend = () => {
     return (
-        <div style={{
+        <div className="map-legend-overlay" style={{
             position: 'absolute',
             bottom: '80px',
             right: '10px',
@@ -122,9 +119,9 @@ const TripStats = ({ tripData }) => {
     const placesCount = tripData.days.reduce((acc, day) => acc + day.stops.length, 0);
 
     return (
-        <div style={{
+        <div className="trip-stats-overlay" style={{
             position: 'absolute',
-            bottom: '150px', // Above legend
+            bottom: '25px', // Adjusted to be the main bottom-right element
             right: '10px',
             background: 'white',
             padding: '12px 16px',
@@ -147,7 +144,6 @@ const TripStats = ({ tripData }) => {
                 <i className="fa-solid fa-location-dot" style={{ color: '#666' }}></i>
                 <span>{placesCount} Places</span>
             </div>
-            {/* Optional Distance if needed, can add later */}
         </div>
     );
 };
@@ -165,6 +161,7 @@ const MapTypeSelector = ({ map, currentType }) => {
 
     return (
         <div
+            className="map-type-overlay"
             style={{
                 position: 'absolute',
                 top: '10px',
@@ -226,6 +223,7 @@ const MapTypeSelector = ({ map, currentType }) => {
 const MiniMap = ({ onLoad, options, viewportBounds }) => {
     return (
         <GoogleMap
+            mapContainerClassName="minimap-overlay"
             mapContainerStyle={{
                 position: 'absolute',
                 top: '10px',
@@ -264,7 +262,7 @@ const MiniMap = ({ onLoad, options, viewportBounds }) => {
 }
 
 
-const MapView = ({ activeView, currentTripData, mapCenter, mapZoom, onMarkerClick, activeRoute, selectedMarkerId, onMapClick, onNavigate }) => {
+const MapView = ({ activeView, currentTripData, mapCenter, mapZoom, onMarkerClick, activeRoute, selectedMarkerId, onMapClick, onNavigate, isLoaded }) => {
     const { theme } = useApp();
     const [map, setMap] = useState(null);
     const [routePositions, setRoutePositions] = useState([]);
@@ -276,12 +274,6 @@ const MapView = ({ activeView, currentTripData, mapCenter, mapZoom, onMarkerClic
 
     // Track if we've done the initial zoom
     const initialZoomDone = useRef(false);
-
-    const { isLoaded } = useJsApiLoader({
-        id: 'google-map-script',
-        googleMapsApiKey: "AIzaSyCmHV3xkO2aRDnuNUB-4nyLjeDT123_lbI", // PROVIDED KEY
-        libraries
-    });
 
     const onLoad = useCallback(function callback(mapInstance) {
         setMap(mapInstance);
@@ -515,6 +507,46 @@ const MapView = ({ activeView, currentTripData, mapCenter, mapZoom, onMarkerClic
                             const isHotel = stop.type === 'hotel';
                             const isSelected = selectedMarkerId === `${dIdx}-${sIdx}`;
 
+                            const imageUrl = stop.placeDetails?.photo_urls?.[0]; // Get first photo if available
+
+                            // Custom image bubble for selected active place
+                            if (isSelected && imageUrl) {
+                                return (
+                                    <OverlayView
+                                        key={`${dIdx}-${sIdx}`}
+                                        position={{ lat: stop.lat, lng: stop.lng }}
+                                        mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                                    >
+                                        <div
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (onMarkerClick) onMarkerClick(stop.lat, stop.lng, dIdx, sIdx);
+                                            }}
+                                            style={{ position: 'relative', cursor: 'pointer' }}
+                                        >
+                                            {/* The Large Image Bubble */}
+                                            <div className="place-image-bubble" style={{ backgroundImage: `url(${imageUrl})` }}></div>
+
+                                            {/* The Anchor Point (Small Dot on path) */}
+                                            <div style={{
+                                                width: '16px', // Slightly larger to be visible
+                                                height: '16px',
+                                                background: '#fa4d4d', // App accent color
+                                                borderRadius: '50%',
+                                                border: '3px solid white',
+                                                boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                                                position: 'absolute',
+                                                top: '-6px',
+                                                left: '50%',
+                                                transform: 'translate(-50%, -50%)',
+                                                zIndex: 101 // Ensure dot is above path but bubble z-index handles the rest
+                                            }}></div>
+                                        </div>
+                                    </OverlayView>
+                                );
+                            }
+
+                            // Default Marker
                             return (
                                 <OverlayView
                                     key={`${dIdx}-${sIdx}`}
@@ -600,7 +632,7 @@ const MapView = ({ activeView, currentTripData, mapCenter, mapZoom, onMarkerClic
             {activeView === 'itinerary' && <TripStats tripData={currentTripData} />}
 
             {/* Legend (Bottom-Right) */}
-            {activeView === 'itinerary' && <MapLegend />}
+            {/* LEGEND REMOVED */}
 
             {/* Custom Overlay Panel for Popup */}
             {selectedStop && (
