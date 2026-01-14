@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const PlacePopup = ({ stop, onNavigate }) => {
+const PlacePopup = ({ stop, onNavigate, dragHandleProps, onClose }) => {
     const [activeTab, setActiveTab] = useState('About');
     const [showHours, setShowHours] = useState(false);
     const details = stop.placeDetails || {};
@@ -60,17 +60,76 @@ const PlacePopup = ({ stop, onNavigate }) => {
     if (hasBooking) tabs.splice(1, 0, 'Book');
 
     return (
-        <div className="map-popup-card">
-            {/* Navigation Header */}
-            <div className="popup-nav-header" style={{ display: 'flex', alignItems: 'center', padding: '10px 15px', borderBottom: '1px solid var(--border-color)' }}>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <div className="map-popup-card" style={{ position: 'relative' }}>
+            {/* Unified Grid Header */}
+            <div className="popup-header-grid" style={{
+                display: 'grid',
+                gridTemplateColumns: 'auto 1fr auto',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '10px 15px',
+                borderBottom: '1px solid var(--border-color)',
+                flexShrink: 0,
+                position: 'relative' // For absolute centering of bar
+            }}>
+                {/* Visual Centered Drag Bar (Absolute) */}
+                <div
+                    {...dragHandleProps}
+                    style={{
+                        position: 'absolute',
+                        left: '50%',
+                        top: '20%',
+                        transform: 'translate(-50%, -50%)',
+                        cursor: 'row-resize',
+                        zIndex: 1 // Ensure it's above other things if overlapping, but buttons are z-index auto?
+                        // If it overlaps buttons, it might block them. Buttons are on sides. 40px bar is small.
+                        // Safe.
+                    }}
+                >
+                    <div className="panel-drag-bar" style={{ width: '40px', height: '4px', background: '#e0e0e0', borderRadius: '4px' }}></div>
+                </div>
+
+                {/* Left: Nav Buttons */}
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', position: 'relative', zIndex: 2 }}>
                     <button onClick={() => onNavigate('prev')} style={{ background: 'none', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '4px 10px', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--text-main)' }} title="Previous">
                         <i className="fa-solid fa-chevron-left"></i>
                     </button>
                     <button onClick={() => onNavigate('next')} style={{ background: 'none', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '4px 10px', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--text-main)' }} title="Next">
                         <i className="fa-solid fa-chevron-right"></i>
                     </button>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontWeight: 600, marginLeft: '5px' }}>{(stop.globalIndex !== undefined ? stop.globalIndex : 0) + 1} of {stop.totalStops}</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontWeight: 600, marginLeft: '5px', whiteSpace: 'nowrap' }}>{(stop.globalIndex !== undefined ? stop.globalIndex : 0) + 1} of {stop.totalStops}</span>
+                </div>
+
+                {/* Center: Invisible Drag Hit Area (Fills space but doesn't hold the bar) */}
+                <div
+                    className="panel-drag-handle-area"
+                    {...dragHandleProps}
+                    style={{
+                        margin: 0,
+                        height: '100%',
+                        display: 'block', // Just fill
+                        cursor: 'row-resize',
+                        touchAction: 'none',
+                        width: '100%'
+                    }}
+                />
+
+                {/* Right: Close Button */}
+                <div
+                    onClick={onClose}
+                    style={{
+                        cursor: 'pointer',
+                        color: 'var(--text-light)',
+                        fontSize: '1.2rem',
+                        padding: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'relative',
+                        zIndex: 2
+                    }}
+                >
+                    <i className="fa-solid fa-xmark"></i>
                 </div>
             </div>
 

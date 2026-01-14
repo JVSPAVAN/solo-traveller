@@ -123,18 +123,16 @@ const ItineraryView = ({ onOpenReservation, onOpenShare, onOpenInvite, onMarkerC
                                 {currentTripData.days.length > 0 ? `${currentTripData.days[0].dateString} - ${currentTripData.days[currentTripData.days.length - 1].dateString}` : 'Dates to be decided'}
                             </div>
                             <div className="invite-section">
-                                <div className="avatar-stack">
-                                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100" className="stack-img" alt="User" />
-                                    <div className="stack-add-btn" onClick={onOpenInvite}><i className="fa-solid fa-plus"></i></div>
-                                </div>
-                                {/* <button className="btn-invite" onClick={onOpenInvite} style={{ marginLeft: '10px' }}>Invite</button> */}
+                                <button className="action-btn" onClick={onOpenInvite} style={{ background: 'var(--bg-hover)', border: 'none', borderRadius: '20px', padding: '6px 14px', fontSize: '0.9rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <i className="fa-solid fa-plus"></i> Invite
+                                </button>
                             </div>
                         </div>
                     </div>
 
                     <div className="action-row">
                         <button className="action-btn save-btn" onClick={handleSaveTrip}>
-                            <i className="fa-regular fa-bookmark"></i> Save
+                            <i className={currentTripData.id ? "fa-solid fa-bookmark" : "fa-regular fa-bookmark"}></i> {currentTripData.id ? "Saved" : "Save"}
                         </button>
                         <button className="action-btn share-btn" onClick={onOpenShare} disabled={!currentTripData.id}>
                             <i className="fa-solid fa-share-nodes"></i> Share

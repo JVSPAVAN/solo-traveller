@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import { GoogleMap, Polyline, OverlayView, Rectangle } from '@react-google-maps/api';
 import PlacePopup from './PlacePopup';
 import { useApp } from '../../context/AppContext';
+import DraggablePanel from './DraggablePanel';
 
 const containerStyle = {
     width: '100%',
@@ -636,14 +637,17 @@ const MapView = ({ activeView, currentTripData, mapCenter, mapZoom, onMarkerClic
 
             {/* Custom Overlay Panel for Popup */}
             {selectedStop && (
-                <div className="custom-map-panel-overlay">
-                    <div className="panel-close-btn" onClick={() => onMarkerClick(null)}><i className="fa-solid fa-xmark"></i></div>
-                    <PlacePopup
-                        key={selectedMarkerId}
-                        stop={selectedStop}
-                        onNavigate={onNavigate}
-                    />
-                </div>
+                <DraggablePanel className="custom-map-panel-overlay">
+                    {(dragHandlers) => (
+                        <PlacePopup
+                            key={selectedMarkerId}
+                            stop={selectedStop}
+                            onNavigate={onNavigate}
+                            dragHandleProps={dragHandlers}
+                            onClose={() => onMarkerClick(null)}
+                        />
+                    )}
+                </DraggablePanel>
             )}
         </div>
     );

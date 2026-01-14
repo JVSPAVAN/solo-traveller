@@ -74,6 +74,15 @@ export const AppProvider = ({ children }) => {
                 isUpcoming: true
             };
             setMyTrips(prev => [formattedTrip, ...prev]);
+
+            // Context: Update currentTripData with the new ID so the UI reflects "Saved" state
+            setCurrentTripData(prev => ({
+                ...prev,
+                id: savedTrip.id,
+                // Merging other fields might be risky if backend format differs significantly from frontend state
+                // but ID is crucial for Share/Save status.
+                isSaved: true
+            }));
         } catch (error) {
             console.error("Failed to save trip", error);
         }

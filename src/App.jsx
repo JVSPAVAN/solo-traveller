@@ -267,23 +267,7 @@ function App() {
                 />
               </div>
 
-              {/* Mobile View Toggle Buttons (Floating) - Only active in Itinerary View */}
-              {activeView === 'itinerary' && (
-                <div className="mobile-view-toggle">
-                  <button
-                    className={`toggle-bubble-btn ${mobileViewMode === 'list' ? 'active' : ''}`}
-                    onClick={() => setMobileViewMode('list')}
-                  >
-                    <i className="fa-solid fa-list-ul"></i>
-                  </button>
-                  <button
-                    className={`toggle-bubble-btn ${mobileViewMode === 'map' ? 'active' : ''}`}
-                    onClick={() => setMobileViewMode('map')}
-                  >
-                    <i className="fa-solid fa-map-location-dot"></i>
-                  </button>
-                </div>
-              )}
+              {/* Mobile View Toggle Removed - Moved to BottomNav */}
 
             </div>
           </>
@@ -291,7 +275,12 @@ function App() {
       </div>
 
       {/* Bottom Nav Restored */}
-      <BottomNav activeView={activeView} onSwitchView={handleSwitchView} />
+      <BottomNav
+        activeView={activeView}
+        onSwitchView={handleSwitchView}
+        mobileViewMode={mobileViewMode}
+        setMobileViewMode={setMobileViewMode}
+      />
 
       {/* Modals */}
       <AuthModal
