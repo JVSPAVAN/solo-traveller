@@ -5,6 +5,11 @@ import { useApp } from '../../context/AppContext';
 const LandingPage = ({ onStartPlanning, onOpenGeneric, onOpenAuth, onOpenPayment }) => {
     const { isLoggedIn } = useApp();
     const [showCopyright, setShowCopyright] = useState(true);
+    const [activeAccordion, setActiveAccordion] = useState(null);
+
+    const toggleAccordion = (section) => {
+        setActiveAccordion(prev => prev === section ? null : section);
+    };
 
     const openPayment = (name, price) => {
         if (!isLoggedIn) {
@@ -185,23 +190,29 @@ const LandingPage = ({ onStartPlanning, onOpenGeneric, onOpenAuth, onOpenPayment
                                 <h4 style={{ color: 'var(--primary-orange)', display: 'flex', alignItems: 'center', gap: '8px' }}><i className="fa-solid fa-route"></i> SoloTraveller</h4>
                                 <p style={{ color: '#9ca3af', fontSize: '0.9rem', lineHeight: 1.6 }}>Your ultimate companion for exploring the world. Plan, track, and share your adventures with ease.</p>
                             </div>
-                            <div className="footer-col">
-                                <h4>Product</h4>
-                                <a>Planner</a>
-                                <a>Budget Tracker</a>
-                                <a>Map View</a>
+                            <div className={`footer-col accordion-col ${activeAccordion === 'product' ? 'active' : ''}`}>
+                                <h4 onClick={() => toggleAccordion('product')}>Product <i className="fa-solid fa-chevron-down accordion-icon"></i></h4>
+                                <div className="footer-links">
+                                    <a>Planner</a>
+                                    <a>Budget Tracker</a>
+                                    <a>Map View</a>
+                                </div>
                             </div>
-                            <div className="footer-col">
-                                <h4>Company</h4>
-                                <a>About Us</a>
-                                <a>Careers</a>
-                                <a>Press</a>
+                            <div className={`footer-col accordion-col ${activeAccordion === 'company' ? 'active' : ''}`}>
+                                <h4 onClick={() => toggleAccordion('company')}>Company <i className="fa-solid fa-chevron-down accordion-icon"></i></h4>
+                                <div className="footer-links">
+                                    <a>About Us</a>
+                                    <a>Careers</a>
+                                    <a>Press</a>
+                                </div>
                             </div>
-                            <div className="footer-col">
-                                <h4>Support</h4>
-                                <a onClick={() => onOpenGeneric('faq')}>Help Center</a>
-                                <a onClick={() => onOpenGeneric('support')}>Contact Us</a>
-                                <a>Privacy Policy</a>
+                            <div className={`footer-col accordion-col ${activeAccordion === 'support' ? 'active' : ''}`}>
+                                <h4 onClick={() => toggleAccordion('support')}>Support <i className="fa-solid fa-chevron-down accordion-icon"></i></h4>
+                                <div className="footer-links">
+                                    <a onClick={() => onOpenGeneric('faq')}>Help Center</a>
+                                    <a onClick={() => onOpenGeneric('support')}>Contact Us</a>
+                                    <a>Privacy Policy</a>
+                                </div>
                             </div>
                         </div>
                         <div className="footer-bottom">

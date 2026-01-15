@@ -718,6 +718,95 @@ input:checked+.slider:before {
   transform: translateY(100%);
 }
 
+/* Default: Hide accordion icon on desktop */
+/* Default: Hide accordion icon on desktop */
+.accordion-icon {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 0;
+    text-align: left;
+  }
+
+  .main-footer {
+    padding-top: 40px;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin: 0;
+  }
+
+  .landing-card {
+    width: 90%;
+    padding: 30px 20px;
+  }
+
+  .landing-logo {
+    font-size: 2rem;
+  }
+
+  .btn-template {
+    display: none;
+  }
+
+  /* Accordion Styles */
+  .accordion-col {
+    border-bottom: 1px solid #333;
+  }
+
+  .accordion-col h4 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 15px 0;
+    margin: 0;
+  }
+
+  .accordion-icon {
+    display: inline-block;
+    /* Show on mobile */
+    transition: transform 0.3s ease;
+  }
+
+  .accordion-col.active .accordion-icon {
+    transform: rotate(180deg);
+  }
+
+  .footer-links {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, padding 0.3s ease;
+  }
+
+  .accordion-col.active .footer-links {
+    max-height: 200px;
+    /* Approximate height for links */
+    opacity: 1;
+    padding-bottom: 15px;
+    /* Moved padding here for smooth transition */
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 /* --- LANDING PAGE EXTENSIONS --- */
 
@@ -3889,7 +3978,7 @@ input[type='text']::-webkit-calendar-picker-indicator {
 /* Fix: Adjust heights to account for Bottom Navbar (approx 80px) */
 .sidebar {
   height: calc(100vh - 140px);
-  top: 3em;
+  top: 4em;
   /* 60px Top + 80px Bottom */
 }
 
@@ -4061,7 +4150,7 @@ input[type='text']::-webkit-calendar-picker-indicator {
   display: flex;
   gap: 10px;
   /* Reduced gap */
-  margin-bottom: 25px;
+  /* margin-bottom: 25px; */
   position: relative;
   padding-left: 5px;
   /* Space for hover actions */
@@ -4643,12 +4732,11 @@ input[type='text']::-webkit-calendar-picker-indicator {
 }
 
 .map-wrapper {
-  margin-top: 3em;
+  margin-top: 4em;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  height: calc(100% - 3em) !important;
+  height: calc(100% - 5em) !important;
+  margin-right: 0.5em;
 }
 
 

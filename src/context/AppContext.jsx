@@ -27,7 +27,15 @@ export const AppProvider = ({ children }) => {
         if (isLoggedIn) {
             getTrips()
                 .then(data => {
-                    setMyTrips(data);
+                    const formattedTrips = data.map(trip => ({
+                        ...trip,
+                        id: trip._id,
+                        title: trip.destination || "Untitled Trip",
+                        date: new Date(trip.start_date || Date.now()).toLocaleDateString(),
+                        img: getRandomImage(trip._id), // Pexels
+                        isUpcoming: new Date(trip.start_date || Date.now()) > new Date()
+                    }));
+                    setMyTrips(formattedTrips);
                 })
                 .catch(err => console.error("Failed to load trips", err));
         } else {
@@ -39,6 +47,31 @@ export const AppProvider = ({ children }) => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
         document.documentElement.setAttribute('data-theme', newTheme);
+    };
+
+    // Pexels Landscape Images
+    const TRIP_IMAGES = [
+        "https://images.pexels.com/photos/33315262/pexels-photo-33315262/free-photo-of-serene-alpine-meadow-with-foggy-mountain.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/5679123/pexels-photo-5679123.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/34029103/pexels-photo-34029103/free-photo-of-stunning-view-of-swiss-alps-and-lake-in-autumn.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/4510854/pexels-photo-4510854.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/6788080/pexels-photo-6788080.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/592077/pexels-photo-592077.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/5230937/pexels-photo-5230937.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/31949547/pexels-photo-31949547/free-photo-of-aerial-view-of-lush-rice-terraces-in-bengkulu.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/35623136/pexels-photo-35623136/free-photo-of-snowy-lofoten-fjord-landscape-under-cloudy-sky.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/34314175/pexels-photo-34314175/free-photo-of-scenic-view-of-dolomites-mountain-landscape.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ];
+
+    const getRandomImage = (id) => {
+        // Use ID to consistently pick same image for a trip
+        if (!id) return TRIP_IMAGES[0];
+        let hash = 0;
+        for (let i = 0; i < id.length; i++) {
+            hash = id.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const index = Math.abs(hash) % TRIP_IMAGES.length;
+        return TRIP_IMAGES[index];
     };
 
     const login = (userData) => {
@@ -60,17 +93,20 @@ export const AppProvider = ({ children }) => {
             destination: trip.title || "Untitled Trip",
             start_date: trip.startDate || new Date(),
             end_date: trip.endDate || new Date(),
-            notes: trip.notes || ""
+            notes: trip.notes || "",
+            itinerary_data: trip.days || []
         };
 
         try {
             const savedTrip = await createTrip(tripPayload);
+            const normalizedTrip = { ...savedTrip, id: savedTrip.id || savedTrip._id };
+
             // Format for frontend
             const formattedTrip = {
-                ...savedTrip,
-                title: savedTrip.destination,
-                date: new Date(savedTrip.start_date || Date.now()).toLocaleDateString(),
-                img: "https://images.unsplash.com/photo-1474044159687-1ee9f86ac5f4?w=500", // Placeholder
+                ...normalizedTrip,
+                title: normalizedTrip.destination,
+                date: new Date(normalizedTrip.start_date || Date.now()).toLocaleDateString(),
+                img: getRandomImage(normalizedTrip.id), // Pexels
                 isUpcoming: true
             };
             setMyTrips(prev => [formattedTrip, ...prev]);
@@ -78,13 +114,57 @@ export const AppProvider = ({ children }) => {
             // Context: Update currentTripData with the new ID so the UI reflects "Saved" state
             setCurrentTripData(prev => ({
                 ...prev,
-                id: savedTrip.id,
+                id: normalizedTrip.id,
                 // Merging other fields might be risky if backend format differs significantly from frontend state
                 // but ID is crucial for Share/Save status.
                 isSaved: true
             }));
         } catch (error) {
             console.error("Failed to save trip", error);
+        }
+    };
+
+    const loadTrip = (savedTrip) => {
+        // Construct the full trip object from the saved trip
+        // We assume savedTrip comes from myTrips list which should have itinerary_data loaded
+        const fullTrip = {
+            id: savedTrip.id || savedTrip._id,
+            title: savedTrip.destination || savedTrip.title,
+            startDate: new Date(savedTrip.start_date || savedTrip.date),
+            endDate: new Date(savedTrip.end_date || savedTrip.date), // Fallback if no end date
+            notes: savedTrip.notes,
+            days: savedTrip.itinerary_data || [], // Restore the itinerary data
+            isSaved: true,
+            isGenerating: false
+        };
+
+        // Format dates in days if they are plain strings from JSON
+        if (fullTrip.days && fullTrip.days.length > 0) {
+            // Re-hydrate any date objects if needed, though they are usually strings in JSON
+        }
+
+        setCurrentTripData(fullTrip);
+    };
+
+    const getTripById = async (id) => {
+        // First check if we have it in myTrips
+        const found = myTrips.find(t => (t.id === id || t._id === id));
+        if (found) {
+            loadTrip(found);
+            return found;
+        }
+
+        // If not, fetch from API (if we had a getTrip API endpoint wired up fully in service)
+        // For now, rely on myTrips being loaded. If myTrips is empty (page refresh), 
+        // we might need to wait for myTrips to populate or fetch individually.
+        try {
+            // import getTrip service
+            // const trip = await getTripService(user.id, id);
+            // setMyTrips...
+            // For this iteration, we assume myTrips populates fast or we accept a small delay/loading state in UI
+            return null;
+        } catch (e) {
+            return null;
         }
     };
 
@@ -176,6 +256,8 @@ export const AppProvider = ({ children }) => {
             login,
             logout,
             saveTrip,
+            loadTrip,
+            getTripById,
             fetchPlaceCardData
         }}>
             {children}

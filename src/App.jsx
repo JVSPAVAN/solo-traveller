@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useJsApiLoader } from '@react-google-maps/api';
 import { useApp } from './context/AppContext';
-import Navbar from './components/Layout/Navbar'; // Restored
+import Navbar from './components/Layout/Navbar';
 import NavSidebar from './components/Layout/NavSidebar';
 import Sidebar from './components/Layout/Sidebar';
-import BottomNav from './components/Layout/BottomNav'; // Restored
+import BottomNav from './components/Layout/BottomNav';
 import LandingPage from './components/Views/LandingPage';
 import ItineraryView from './components/Views/ItineraryView';
 import TripsView from './components/Views/TripsView';
@@ -12,6 +12,9 @@ import BudgetView from './components/Views/BudgetView';
 import MapView from './components/Map/MapView';
 import Toast from './components/UI/Toast';
 import Confetti from './components/UI/Confetti';
+
+// Router
+import { Routes, Route, useNavigate, useLocation, useParams, Navigate } from 'react-router-dom';
 
 // Modals
 import AuthModal from './components/Modals/AuthModal';
@@ -24,8 +27,46 @@ import PaymentModal from './components/Shared/PaymentModal';
 
 const libraries = ['geometry', 'places'];
 
+// Wrapper to handle itinerary ID from URL
+const ItineraryRouteWrapper = ({ onOpenReservation, onOpenShare, onOpenInvite, onMarkerClick, onShowRoute, expandedDay }) => {
+  const { tripId } = useParams();
+  const { getTripById, currentTripData } = useApp();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (tripId) {
+      if (currentTripData && (currentTripData.id === tripId || currentTripData._id === tripId)) {
+        setLoading(false);
+      } else {
+        const fetch = async () => {
+          await getTripById(tripId);
+          setLoading(false);
+        };
+        fetch();
+      }
+    } else {
+      setLoading(false);
+    }
+  }, [tripId, currentTripData, getTripById]);
+
+  if (loading) return <div style={{ padding: '20px' }}>Loading Trip...</div>;
+
+  return (
+    <ItineraryView
+      onOpenReservation={onOpenReservation}
+      onOpenShare={onOpenShare}
+      onOpenInvite={onOpenInvite}
+      onMarkerClick={onMarkerClick}
+      onShowRoute={onShowRoute}
+      expandedDay={expandedDay}
+    />
+  );
+};
+
 function App() {
-  const { isLoggedIn, currentTripData, setCurrentTripData, fetchPlaceCardData } = useApp();
+  const { isLoggedIn, currentTripData, setCurrentTripData, fetchPlaceCardData, loadTrip } = useApp();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -43,7 +84,18 @@ function App() {
       }, 2000); // 2 seconds delay to show splash
     }
   }, []);
-  const [activeView, setActiveView] = useState('landing');
+
+  // Determine active view from path
+  const getActiveViewFromPath = (path) => {
+    if (path === '/' || path.includes('/landing')) return 'landing';
+    if (path.includes('/itinerary')) return 'itinerary';
+    if (path.includes('/trips')) return 'explore'; // naming mapping
+    if (path.includes('/budget')) return 'budget';
+    if (path.includes('/account')) return 'account'; // NEW
+    return 'landing';
+  };
+
+  const activeView = getActiveViewFromPath(location.pathname);
   const [mapCenter, setMapCenter] = useState(null);
   const [mapZoom, setMapZoom] = useState(null);
 
@@ -87,10 +139,26 @@ function App() {
   };
 
   const handleSwitchView = (view) => {
-    setActiveView(view);
-    if (view === 'itinerary' && currentTripData && currentTripData.days.length > 0) {
-      // Fit bounds logic could go here or in MapView
-    } else if (view !== 'itinerary') {
+    if (view === 'itinerary') {
+      if (currentTripData && currentTripData.id) {
+        navigate(`/app/itinerary/${currentTripData.id}`);
+      } else {
+        navigate('/app/itinerary/new');
+      }
+    } else if (view === 'explore') {
+      navigate('/app/trips');
+    } else if (view === 'budget') {
+      navigate('/app/budget');
+    } else if (view === 'account') {
+      navigate('/app/account');
+    } else if (view === 'landing') {
+      navigate('/');
+    } else {
+      navigate('/app/' + view);
+    }
+
+    // Reset Map for non-itinerary
+    if (view !== 'itinerary') {
       setMapCenter([20, 0]);
       setMapZoom(2);
     }
@@ -108,22 +176,18 @@ function App() {
   const handleStartManual = () => {
     toggleModal('planType', false);
     setCurrentTripData({ title: "Untitled Trip", days: [] });
-    handleSwitchView('itinerary');
+    navigate('/app/itinerary/new');
     setMapCenter([20, 0]);
     setMapZoom(2);
   };
 
   const handleTemplateGenerate = () => {
-    handleSwitchView('itinerary');
+    navigate('/app/itinerary/new'); // Or specific ID if generated
   };
 
   const [activeRoute, setActiveRoute] = useState(null);
   const [expandedDay, setExpandedDay] = useState(null);
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
-
-
-
-  // ... (existing code)
 
   const handleMarkerClick = (lat, lng, dayIdx, stopIdx) => {
     if (lat === null) {
@@ -200,7 +264,7 @@ function App() {
       <Confetti fire={showConfetti} />
       <Toast show={toast.show} message={toast.message} type={toast.type} onClose={() => setToast(prev => ({ ...prev, show: false }))} />
 
-      {/* Top Navbar Restored */}
+      {/* Top Navbar */}
       <Navbar
         onOpenAuth={() => toggleModal('auth', true)}
         onOpenTemplate={() => toggleModal('planType', true)}
@@ -208,79 +272,96 @@ function App() {
         onOpenGeneric={(type) => { setGenericType(type); toggleModal('generic', true); }}
       />
 
-      {/* Middle Content Area */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden', position: 'relative' }}>
-
-        {activeView === 'landing' ? (
-          <div style={{ width: '100%', overflowY: 'auto' }}>
-            <LandingPage
-              onStartPlanning={handleStartPlanning}
-              onOpenAuth={() => toggleModal('auth', true)}
-              onOpenPayment={(name, price) => { setPaymentPlan({ name, price }); toggleModal('payment', true); }}
-              onOpenGeneric={(type) => { setGenericType(type); toggleModal('generic', true); }}
-            />
-          </div>
-        ) : (
-          <>
-            {/* Left Nav Sidebar */}
-            <NavSidebar
-              activeView={activeView}
-              onSwitchView={handleSwitchView}
-              isCollapsed={isSidebarCollapsed}
-              toggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            />
-
-            {/* Content Area (Sidebar + Map) */}
-            <div className="main-container" style={{ height: '100%', width: '100%', flex: 1, display: 'flex' }}>
-
-              {/* Sidebar Container */}
-              <div className={`sidebar-wrapper ${mobileViewMode === 'map' ? 'mobile-hidden' : ''}`} style={{ display: 'contents' }}>
-                <Sidebar className={isSidebarCollapsed ? 'expanded-width' : ''}>
-                  {activeView === 'itinerary' && (
-                    <ItineraryView
-                      onOpenReservation={(type) => { setReservationType(type); toggleModal('reservation', true); }}
-                      onOpenShare={() => toggleModal('share', true)}
-                      onOpenInvite={() => { setGenericType('friends'); toggleModal('generic', true); }}
-                      onMarkerClick={handleMarkerClick}
-                      onShowRoute={handleShowRoute}
-                      expandedDay={expandedDay}
-                    />
-                  )}
-                  {activeView === 'explore' && <TripsView />}
-                  {activeView === 'budget' && <BudgetView onAddExpense={() => showToast('Expense added successfully!', 'success')} />}
-                  {['notes', 'places'].includes(activeView) && <div style={{ padding: '20px' }}>Placeholder for {activeView}</div>}
-                </Sidebar>
-              </div>
-
-              {/* Map Container Wrapper */}
-              <div className={`map-wrapper ${mobileViewMode === 'list' && activeView === 'itinerary' ? 'mobile-hidden' : ''}`} style={{ flex: 1, position: 'relative', height: '100%' }}>
-                <MapView
-                  activeView={activeView}
-                  currentTripData={currentTripData}
-                  mapCenter={mapCenter}
-                  mapZoom={mapZoom}
-                  onMarkerClick={handleMarkerClick}
-                  activeRoute={activeRoute}
-                  selectedMarkerId={selectedMarkerId}
-                  onNavigate={handleNavigate}
-                  isLoaded={isLoaded}
-                />
-              </div>
-
-              {/* Mobile View Toggle Removed - Moved to BottomNav */}
-
+        <Routes>
+          <Route path="/" element={
+            <div style={{ width: '100%', overflowY: 'auto' }}>
+              <LandingPage
+                onStartPlanning={handleStartPlanning}
+                onOpenAuth={() => toggleModal('auth', true)}
+                onOpenPayment={(name, price) => { setPaymentPlan({ name, price }); toggleModal('payment', true); }}
+                onOpenGeneric={(type) => { setGenericType(type); toggleModal('generic', true); }}
+              />
             </div>
-          </>
-        )}
+          } />
+
+          <Route path="/app/*" element={
+            <>
+              {/* Left Nav Sidebar */}
+              <NavSidebar
+                activeView={activeView}
+                onSwitchView={handleSwitchView}
+                isCollapsed={isSidebarCollapsed}
+                toggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              />
+
+              {/* Content Area (Sidebar + Map) */}
+              <div className="main-container" style={{ height: '100%', width: '100%', flex: 1, display: 'flex' }}>
+
+                {/* Sidebar Container */}
+                <div className={`sidebar-wrapper ${mobileViewMode === 'map' ? 'mobile-hidden' : ''}`} style={{ display: 'contents' }}>
+                  <Sidebar className={isSidebarCollapsed ? 'expanded-width' : ''}>
+                    <Routes>
+                      <Route path="itinerary/:tripId" element={
+                        <ItineraryRouteWrapper
+                          onOpenReservation={(type) => { setReservationType(type); toggleModal('reservation', true); }}
+                          onOpenShare={() => toggleModal('share', true)}
+                          onOpenInvite={() => { setGenericType('friends'); toggleModal('generic', true); }}
+                          onMarkerClick={handleMarkerClick}
+                          onShowRoute={handleShowRoute}
+                          expandedDay={expandedDay}
+                        />
+                      } />
+                      <Route path="itinerary/new" element={
+                        <ItineraryView
+                          onOpenReservation={(type) => { setReservationType(type); toggleModal('reservation', true); }}
+                          onOpenShare={() => toggleModal('share', true)}
+                          onOpenInvite={() => { setGenericType('friends'); toggleModal('generic', true); }}
+                          onMarkerClick={handleMarkerClick}
+                          onShowRoute={handleShowRoute}
+                          expandedDay={expandedDay}
+                        />
+                      } />
+                      <Route path="trips" element={<TripsView onSelectTrip={(trip) => {
+                        loadTrip(trip);
+                        navigate(`/app/itinerary/${trip.id || trip._id}`);
+                      }} />} />
+                      <Route path="budget" element={<BudgetView onAddExpense={() => showToast('Expense added successfully!', 'success')} />} />
+                      <Route path="account" element={<div style={{ padding: '20px' }}>User Account & Settings</div>} />
+                      <Route path="*" element={<div style={{ padding: '20px' }}>Select an option</div>} />
+                    </Routes>
+                  </Sidebar>
+                </div>
+
+                {/* Map Container Wrapper - Always Visible in App Mode */}
+                <div className={`map-wrapper ${mobileViewMode === 'list' && activeView === 'itinerary' ? 'mobile-hidden' : ''}`} style={{ flex: 1, position: 'relative', height: '100%' }}>
+                  <MapView
+                    activeView={activeView}
+                    currentTripData={currentTripData}
+                    mapCenter={mapCenter}
+                    mapZoom={mapZoom}
+                    onMarkerClick={handleMarkerClick}
+                    activeRoute={activeRoute}
+                    selectedMarkerId={selectedMarkerId}
+                    onNavigate={handleNavigate}
+                    isLoaded={isLoaded}
+                  />
+                </div>
+
+              </div>
+            </>
+          } />
+        </Routes>
       </div>
 
-      {/* Bottom Nav Restored */}
-      <BottomNav
-        activeView={activeView}
-        onSwitchView={handleSwitchView}
-        mobileViewMode={mobileViewMode}
-        setMobileViewMode={setMobileViewMode}
-      />
+      {activeView !== 'landing' && (
+        <BottomNav
+          activeView={activeView}
+          onSwitchView={handleSwitchView}
+          mobileViewMode={mobileViewMode}
+          setMobileViewMode={setMobileViewMode}
+        />
+      )}
 
       {/* Modals */}
       <AuthModal

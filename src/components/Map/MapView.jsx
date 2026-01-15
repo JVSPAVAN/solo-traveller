@@ -7,7 +7,6 @@ import DraggablePanel from './DraggablePanel';
 const containerStyle = {
     width: '100%',
     height: '100%',
-    borderRadius: '1.5rem', // ROUNDED CORNERS
     overflow: 'hidden'      // MATCH IMAGE
 };
 
