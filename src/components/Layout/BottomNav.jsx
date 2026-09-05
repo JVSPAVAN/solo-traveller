@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const BottomNav = ({ activeView, onSwitchView, mobileViewMode, setMobileViewMode }) => {
+const BottomNav = ({ activeView, onSwitchView, mobileViewMode, setMobileViewMode, hasTrip }) => {
     const [showOptions, setShowOptions] = useState(false);
 
     const handleItineraryClick = () => {
@@ -16,6 +16,28 @@ const BottomNav = ({ activeView, onSwitchView, mobileViewMode, setMobileViewMode
         setMobileViewMode(mode);
         setShowOptions(false);
     };
+
+    // Keep both controls on the current trip route instead of opening Trips.
+    // O(1) time/space: no itinerary copying or new AI request on view switches.
+    if (hasTrip) {
+        const selectTripView = (mode) => {
+            setMobileViewMode(mode);
+            if (activeView !== 'itinerary') onSwitchView('itinerary');
+        };
+        return (
+            <nav className="bottom-navbar show" id="app-bottom-nav" aria-label="Trip views">
+                <button type="button" aria-label="Trip list" aria-pressed={activeView === 'itinerary' && mobileViewMode === 'list'} className={`nav-item ${activeView === 'itinerary' && mobileViewMode === 'list' ? 'active' : ''}`} onClick={() => selectTripView('list')}>
+                    <i className="fa-solid fa-list-check" /><span>List</span>
+                </button>
+                <button type="button" aria-label="Trip map" aria-pressed={activeView === 'itinerary' && mobileViewMode === 'map'} className={`nav-item ${activeView === 'itinerary' && mobileViewMode === 'map' ? 'active' : ''}`} onClick={() => selectTripView('map')}>
+                    <i className="fa-solid fa-map-location-dot" /><span>Map</span>
+                </button>
+                <button type="button" aria-label="Trip expenses" aria-pressed={activeView === 'budget'} className={`nav-item ${activeView === 'budget' ? 'active' : ''}`} onClick={() => onSwitchView('budget')}>
+                    <i className="fa-solid fa-wallet" /><span>Expenses</span>
+                </button>
+            </nav>
+        );
+    }
 
     return (
         <>

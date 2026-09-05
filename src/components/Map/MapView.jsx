@@ -262,7 +262,7 @@ const MiniMap = ({ onLoad, options, viewportBounds }) => {
 }
 
 
-const MapView = ({ activeView, currentTripData, mapCenter, mapZoom, onMarkerClick, activeRoute, selectedMarkerId, onMapClick, onNavigate, isLoaded }) => {
+const LoadedMapView = ({ activeView, currentTripData, mapCenter, mapZoom, onMarkerClick, activeRoute, selectedMarkerId, onMapClick, onNavigate, isLoaded }) => {
     const { theme } = useApp();
     const [map, setMap] = useState(null);
     const [routePositions, setRoutePositions] = useState([]);
@@ -352,6 +352,7 @@ const MapView = ({ activeView, currentTripData, mapCenter, mapZoom, onMarkerClic
                     let hasPoints = false;
                     currentTripData.days.forEach(day => {
                         day.stops.forEach(stop => {
+                            if (!Number.isFinite(stop.lat) || !Number.isFinite(stop.lng)) return;
                             bounds.extend({ lat: stop.lat, lng: stop.lng });
                             hasPoints = true;
                         });
@@ -504,6 +505,7 @@ const MapView = ({ activeView, currentTripData, mapCenter, mapZoom, onMarkerClic
                     return currentTripData.days.map((day, dIdx) => {
                         return day.stops.map((stop, sIdx) => {
                             if (stop.type !== 'hotel') globalPlaceCount++;
+                            if (!Number.isFinite(stop.lat) || !Number.isFinite(stop.lng)) return null;
                             const isHotel = stop.type === 'hotel';
                             const isSelected = selectedMarkerId === `${dIdx}-${sIdx}`;
 
@@ -648,6 +650,33 @@ const MapView = ({ activeView, currentTripData, mapCenter, mapZoom, onMarkerClic
                     )}
                 </DraggablePanel>
             )}
+        </div>
+    );
+};
+
+// Google Maps must initialize in a visible, measurable container. Mobile list
+// mode uses display:none, where fitBounds and initial tile layout cannot work.
+const MapView = (props) => {
+    const hostRef = useRef(null);
+    const [hasSize, setHasSize] = useState(false);
+
+    useEffect(() => {
+        const host = hostRef.current;
+        // O(1) time/space per resize; also handles rotation and list/map toggles.
+        const observer = new ResizeObserver(([entry]) => {
+            setHasSize(entry.contentRect.width > 0 && entry.contentRect.height > 0);
+        });
+        observer.observe(host);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <div ref={hostRef} className="trip-map-host">
+            {props.loadError ? (
+                <div role="alert" className="map-status">The map couldn’t load. Check your connection and reload the page; your trip list is still available.</div>
+            ) : !props.isLoaded ? (
+                <div role="status" className="map-status">Loading map…</div>
+            ) : hasSize ? <LoadedMapView {...props} /> : null}
         </div>
     );
 };

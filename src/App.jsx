@@ -68,7 +68,7 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { isLoaded } = useJsApiLoader({
+  const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: "AIzaSyCmHV3xkO2aRDnuNUB-4nyLjeDT123_lbI",
     libraries
@@ -182,6 +182,10 @@ function App() {
   };
 
   const handleTemplateGenerate = () => {
+    setMapCenter(null);
+    setMapZoom(null);
+    setSelectedMarkerId(null);
+    setActiveRoute(null);
     navigate('/app/itinerary/new'); // Or specific ID if generated
   };
 
@@ -345,6 +349,7 @@ function App() {
                     selectedMarkerId={selectedMarkerId}
                     onNavigate={handleNavigate}
                     isLoaded={isLoaded}
+                    loadError={loadError}
                   />
                 </div>
 
@@ -360,6 +365,7 @@ function App() {
           onSwitchView={handleSwitchView}
           mobileViewMode={mobileViewMode}
           setMobileViewMode={setMobileViewMode}
+          hasTrip={Boolean(currentTripData)}
         />
       )}
 
