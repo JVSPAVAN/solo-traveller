@@ -10,14 +10,21 @@ const AuthModal = ({ show, onClose, onLoginSuccess }) => {
     const [bio, setBio] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
     if (!show) return null;
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        if (loading) return;
         setError('');
+        if (!isLoginMode && password !== confirmPassword) {
+            setError('Passwords do not match.');
+            return;
+        }
         setLoading(true);
         try {
             if (isLoginMode) {
@@ -34,7 +41,14 @@ const AuthModal = ({ show, onClose, onLoginSuccess }) => {
                 setError("Account created! Please sign in.");
             }
         } catch (err) {
-            setError(err.response?.data?.error || "Authentication failed");
+            // O(1) time/space: distinguish service outages from incorrect credentials.
+            if (err.response?.status >= 500) {
+                setError('Sign-in is temporarily unavailable. Please try again shortly.');
+            } else if (err.code === 'ECONNABORTED' || err.code === 'ERR_NETWORK') {
+                setError('Unable to reach the server. Please try again shortly.');
+            } else {
+                setError(err.response?.data?.error || 'Authentication failed. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
@@ -46,6 +60,7 @@ const AuthModal = ({ show, onClose, onLoginSuccess }) => {
                 <span className="close-auth" onClick={onClose}><i className="fa-solid fa-xmark"></i></span>
                 <div className="modal-title">{isLoginMode ? "Welcome Back" : "Create Account"}</div>
                 <p style={{ marginBottom: '20px', fontSize: '0.9rem', color: 'var(--text-light)' }}>Access your trips and budget.</p>
+                <form onSubmit={handleSubmit}>
                 {error && <p style={{ color: 'red', fontSize: '0.8rem', marginBottom: '10px' }}>{error}</p>}
                 {!isLoginMode && (
                     <>
@@ -54,13 +69,15 @@ const AuthModal = ({ show, onClose, onLoginSuccess }) => {
                         <textarea className="auth-input" style={{ height: '80px', resize: 'none', paddingTop: '10px' }} placeholder="Bio (Optional)" value={bio} onChange={(e) => setBio(e.target.value)}></textarea>
                     </>
                 )}
-                <input type="email" className="auth-input" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <input type="email" autoComplete="username" required className="auth-input" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} />
 
                 <div style={{ position: 'relative' }}>
                     <input
                         type={showPassword ? "text" : "password"}
                         className="auth-input"
                         placeholder="Password"
+                        required
+                        autoComplete={isLoginMode ? 'current-password' : 'new-password'}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         style={{ paddingRight: '40px' }}
@@ -81,11 +98,12 @@ const AuthModal = ({ show, onClose, onLoginSuccess }) => {
                 </div>
 
                 {!isLoginMode && (
-                    <input type="password" className="auth-input" placeholder="Confirm Password" />
+                    <input type="password" autoComplete="new-password" required className="auth-input" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                 )}
-                <button className="auth-btn" onClick={handleSubmit} disabled={loading}>
+                <button type="submit" className="auth-btn" disabled={loading}>
                     {loading ? "Processing..." : (isLoginMode ? "Sign In" : "Sign Up")}
                 </button>
+                </form>
                 <div className="auth-switch" onClick={() => setIsLoginMode(!isLoginMode)}>
                     {isLoginMode ? "New here? Create an account" : "Already have an account? Sign In"}
                 </div>

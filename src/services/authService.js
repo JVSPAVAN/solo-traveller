@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { PUBLIC_KEY } from '../utils/publicKey';
 
-const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth`;
+const API_URL = `${(import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, '')}/api/auth`;
+// Bound the UI wait, allowing time for a hosted backend to wake up.
+const authClient = axios.create({ timeout: 60000 });
 
 // Helper: Convert PEM to ArrayBuffer
 function pemToArrayBuffer(pem) {
@@ -68,7 +70,7 @@ export const login = async (email, password) => {
     if (!encryptedPassword) {
       throw new Error('Encryption failed');
     }
-    const response = await axios.post(`${API_URL}/login`, {
+    const response = await authClient.post(`${API_URL}/login`, {
       email,
       encryptedPassword,
     });
@@ -77,7 +79,7 @@ export const login = async (email, password) => {
     }
     return response.data;
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Login failed:', error.response?.status || error.code || 'unknown');
     throw error;
   }
 };
@@ -85,7 +87,8 @@ export const login = async (email, password) => {
 export const register = async (name, email, password, location = '', bio = '') => {
   try {
     const encryptedPassword = await encryptPassword(password);
-    const response = await axios.post(`${API_URL}/register`, {
+    if (!encryptedPassword) throw new Error('Encryption failed');
+    const response = await authClient.post(`${API_URL}/register`, {
       name,
       email,
       encryptedPassword,
@@ -95,7 +98,7 @@ export const register = async (name, email, password, location = '', bio = '') =
     // Register usually returns { id, email, name, location, bio }.
     return response.data;
   } catch (error) {
-    console.error('Register error:', error);
+    console.error('Registration failed:', error.response?.status || error.code || 'unknown');
     throw error;
   }
 };
@@ -128,5 +131,11 @@ export const logout = () => {
 };
 
 export const getCurrentUser = () => {
-  return JSON.parse(localStorage.getItem('user'));
+  // O(n) time/space for parsing n stored characters; malformed state must not crash startup.
+  try {
+    const session = JSON.parse(localStorage.getItem('user'));
+    return session?.token && session?.user ? session : null;
+  } catch {
+    return null;
+  }
 };
