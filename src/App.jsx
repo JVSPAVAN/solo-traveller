@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useJsApiLoader } from '@react-google-maps/api';
 import { useApp } from './context/AppContext';
 import Navbar from './components/Layout/Navbar';
@@ -24,6 +24,8 @@ import ShareModal from './components/Modals/ShareModal';
 import PlanTypeModal from './components/Modals/PlanTypeModal';
 import TemplateModal from './components/Modals/TemplateModal';
 import PaymentModal from './components/Shared/PaymentModal';
+
+const LandingNext = lazy(() => import('./components/LandingNext/LandingNext'));
 
 const libraries = ['geometry', 'places'];
 
@@ -269,15 +271,26 @@ function App() {
       <Toast show={toast.show} message={toast.message} type={toast.type} onClose={() => setToast(prev => ({ ...prev, show: false }))} />
 
       {/* Top Navbar */}
-      <Navbar
+      {!/^\/landing\/new\/?$/i.test(location.pathname) && <Navbar
         onOpenAuth={() => toggleModal('auth', true)}
         onOpenTemplate={() => toggleModal('planType', true)}
         onSwitchView={handleSwitchView}
         onOpenGeneric={(type) => { setGenericType(type); toggleModal('generic', true); }}
-      />
+      />}
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden', position: 'relative' }}>
         <Routes>
+          <Route path="/landing/new" element={
+            <Suspense fallback={<div role="status" style={{ padding: 32 }}>Loading SoloTraveller…</div>}>
+              <LandingNext
+                onStartPlanning={handleStartPlanning}
+                onOpenAuth={() => toggleModal('auth', true)}
+                onOpenAI={() => isLoggedIn ? handleOpenTemplate('ai') : toggleModal('auth', true)}
+                onOpenPayment={(name, price) => { setPaymentPlan({ name, price }); toggleModal('payment', true); }}
+                onOpenGeneric={(type) => { setGenericType(type); toggleModal('generic', true); }}
+              />
+            </Suspense>
+          } />
           <Route path="/" element={
             <div style={{ width: '100%', overflowY: 'auto' }}>
               <LandingPage
