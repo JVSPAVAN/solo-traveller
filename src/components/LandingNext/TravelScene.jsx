@@ -1,70 +1,100 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import Artwork, { ART } from './Artwork';
 
-// Decorative scene: bounded geometry makes time and space O(1) per frame.
+// The approved art is a textured plane, not a simplified replacement 3D model.
+// Three.js supplies restrained perspective motion; the SVG stays as the fallback.
 export default function TravelScene({ dark }) {
   const host = useRef(null);
-  const [failed, setFailed] = useState(false);
   useEffect(() => {
-    let disposed = false, cleanup;
-    import('three').then(async THREE => {
-      const { RoundedBoxGeometry } = await import('three/addons/geometries/RoundedBoxGeometry.js');
-      if (disposed) return;
-      const el = host.current;
+    let cancelled = false;
+    let dispose;
+    const el = host.current;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    // Touch devices keep the exact static composition without spending GPU time.
+    if (reduced.matches || !matchMedia('(pointer: fine)').matches) return undefined;
+    import('three').then(THREE => {
+      if (cancelled) return;
       let renderer;
       try { renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true }); }
-      catch { setFailed(true); return; }
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-      el.appendChild(renderer.domElement);
+      catch { return; }
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(36, 1, .1, 100);
-      camera.position.set(0, 1.4, 9.4); camera.lookAt(0, 0, 0);
-      scene.add(new THREE.HemisphereLight(0xffffff, 0x9a8170, 3));
-      const light = new THREE.DirectionalLight(0xfff1df, 4); light.position.set(-3, 5, 5); scene.add(light);
-      const ivory = new THREE.MeshStandardMaterial({ color: 0xeee4d5, roughness: .65 });
-      const coral = new THREE.MeshStandardMaterial({ color: 0xfa4d4d, roughness: .38 });
-      const land = new THREE.MeshStandardMaterial({ color: 0xcebea8, roughness: .9 });
-      const group = new THREE.Group(); scene.add(group);
-      const mesh = (geometry, material, parent, x=0,y=0,z=0) => {
-        const object = new THREE.Mesh(geometry, material); object.position.set(x,y,z); parent.add(object); return object;
+      const camera = new THREE.PerspectiveCamera(30, 1, .1, 20);
+      camera.position.z = 4;
+      const [x, y, width, height] = ART.hero;
+      const geometry = new THREE.PlaneGeometry(width / height * 2, 2);
+      const material = new THREE.MeshBasicMaterial({ transparent: true, toneMapped: false });
+      const plane = new THREE.Mesh(geometry, material);
+      scene.add(plane);
+      let texture, frame = 0, visible = true, loaded = false;
+      let targetX = 0, targetY = 0;
+      const render = () => renderer.render(scene, camera);
+      // O(1) geometry and state per frame; rendering stops when hidden or at rest.
+      const tick = () => {
+        plane.rotation.y += (targetX - plane.rotation.y) * .09;
+        plane.rotation.x += (targetY - plane.rotation.x) * .09;
+        render();
+        if (Math.abs(targetX - plane.rotation.y) + Math.abs(targetY - plane.rotation.x) > .0001)
+          frame = requestAnimationFrame(tick);
+        else frame = 0;
       };
-      const box = (w,h,d,mat,parent,x,y,z) => mesh(new RoundedBoxGeometry(w,h,d,3,.08),mat,parent,x,y,z);
-      const globe = new THREE.Group(); globe.position.set(-.45,.45,0); group.add(globe);
-      mesh(new THREE.SphereGeometry(1.36,48,32),ivory,globe);
-      // Stylized continent silhouettes lie on the sphere instead of a flat decal.
-      const patches = [[[-.85,.65],[-.65,.95],[-.25,.85],[-.05,.6],[-.3,.35],[-.5,.2],[-.7,.4]], [[-.45,.12],[-.08,.05],[.08,-.2],[-.2,-.75],[-.4,-.5]], [[.22,.8],[.6,.9],[.95,.6],[.72,.35],[.38,.45]], [[.25,.3],[.64,.25],[.65,-.05],[.38,-.55],[.18,-.15]]];
-      patches.forEach(points => {
-        const shape = new THREE.Shape(points.map(p => new THREE.Vector2(...p)));
-        const geo = new THREE.ShapeGeometry(shape,12), pos=geo.attributes.position;
-        for(let i=0;i<pos.count;i++){ const x=pos.getX(i),y=pos.getY(i); pos.setZ(i,Math.sqrt(1.37**2-x*x-y*y)); }
-        geo.computeVertexNormals(); mesh(geo,land,globe);
+      const start = () => {
+        if (!frame && visible && !document.hidden && !reduced.matches && loaded) frame = requestAnimationFrame(tick);
+      };
+      const move = event => {
+        const box = el.getBoundingClientRect();
+        targetX = ((event.clientX - box.left) / box.width - .5) * .035;
+        targetY = ((event.clientY - box.top) / box.height - .5) * .025;
+        start();
+      };
+      const reset = () => { targetX = 0; targetY = 0; start(); };
+      const stop = () => { cancelAnimationFrame(frame); frame = 0; };
+      const visibility = () => { if (document.hidden) stop(); else start(); };
+      const motion = () => { stop(); el.classList.toggle('ln-gpu-ready', loaded && !reduced.matches); };
+      const resize = new ResizeObserver(() => {
+        if (!el.clientWidth || !el.clientHeight) return;
+        renderer.setSize(el.clientWidth, el.clientHeight);
+        camera.aspect = el.clientWidth / el.clientHeight;
+        camera.updateProjectionMatrix(); render();
       });
-      function pin(parent,x,y,z){
-        mesh(new THREE.TorusGeometry(.095,.04,10,24),coral,parent,x,y+.1,z);
-        const tip=mesh(new THREE.ConeGeometry(.10,.18,3),coral,parent,x,y-.025,z); tip.rotation.z=Math.PI;
-      }
-      pin(globe,-.92,.5,1.01); pin(globe,.75,.18,1.15);
-      for(let i=0;i<22;i++){ const x=-.85+i*.073,y=.38-.35*Math.sin(i/21*Math.PI); const z=Math.sqrt(1.39**2-x*x-y*y); const dash=box(.043,.023,.018,coral,globe,x,y,z); dash.rotation.z=-.35*Math.cos(i/21*Math.PI); }
-      const luggage=new THREE.Group(); luggage.position.set(1.45,-.45,.35); luggage.rotation.y=-.22; group.add(luggage);
-      box(.94,1.35,.56,ivory,luggage,0,0,0);
-      for(let i=-2;i<=2;i++) box(.035,1.04,.05,land,luggage,i*.15,0,.29);
-      box(.5,.09,.12,coral,luggage,0,.91,0); box(.075,.2,.10,coral,luggage,-.22,.79,0); box(.075,.2,.10,coral,luggage,.22,.79,0);
-      [-.32,.32].forEach(x => mesh(new THREE.SphereGeometry(.10,12,8),land,luggage,x,-.76,0));
-      const map=new THREE.Group(); map.position.set(-.35,-1.1,1.1); map.rotation.x=-.65; map.rotation.z=-.12; group.add(map);
-      for(let i=0;i<3;i++){ const panel=box(.64,.88,.035,ivory,map,(i-1)*.59,0,0); panel.rotation.y=i%2===0?.25:-.25; }
-      for(let i=0;i<15;i++) box(.06,.02,.02,coral,map,-.8+i*.11,Math.sin(i*.5)*.15,.12);
-      pin(map,.53,.15,.16);
-      let visible=true, frame=0; const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
-      const draw = time => { group.rotation.y=motion.matches?0:Math.sin(time*.0003)*.07; renderer.render(scene,camera); };
-      const loop=time=>{ draw(time); if(visible&&!document.hidden&&!motion.matches) frame=requestAnimationFrame(loop); };
-      const resume=()=>{ cancelAnimationFrame(frame); draw(0); if(visible&&!document.hidden&&!motion.matches) frame=requestAnimationFrame(loop); };
-      const resize=new ResizeObserver(()=>{ const {width,height}=el.getBoundingClientRect(); if(!width||!height)return; renderer.setSize(width,height);camera.aspect=width/height;camera.updateProjectionMatrix();draw(0); }); resize.observe(el);
-      const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;resume();});observer.observe(el);
-      motion.addEventListener('change',resume);document.addEventListener('visibilitychange',resume);
-      cleanup=()=>{cancelAnimationFrame(frame);resize.disconnect();observer.disconnect();motion.removeEventListener('change',resume);document.removeEventListener('visibilitychange',resume);scene.traverse(o=>{o.geometry?.dispose();});[ivory,coral,land].forEach(m=>m.dispose());renderer.dispose();renderer.domElement.remove();};
-    }).catch(()=>{if(!disposed)setFailed(true);});
-    return ()=>{disposed=true;cleanup?.();};
-  }, []);
-  return <div className={`ln-scene ${dark?'ln-scene-dark':''}`} role="img" aria-label="A globe, coral travel route, suitcase and folded map"><div ref={host} />{failed&&<div className="ln-scene-fallback"><i className="fa-solid fa-earth-americas"/><i className="fa-solid fa-suitcase-rolling"/><i className="fa-solid fa-map"/></div>}<span>A bigger<br/>world awaits.</span></div>;
+      resize.observe(el);
+      const observer = new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting; if (!visible) stop(); else start();
+      });
+      observer.observe(el);
+      el.appendChild(renderer.domElement);
+      const contextLost = event => { event.preventDefault(); stop(); el.classList.remove('ln-gpu-ready'); };
+      renderer.domElement.addEventListener('webglcontextlost', contextLost);
+      el.addEventListener('pointermove', move);
+      el.addEventListener('pointerleave', reset);
+      document.addEventListener('visibilitychange', visibility);
+      reduced.addEventListener('change', motion);
+      texture = new THREE.TextureLoader().load(`/landing-art/${dark ? 'dark' : 'light'}.jpg`, map => {
+        if (cancelled) { map.dispose(); return; }
+        map.colorSpace = THREE.SRGBColorSpace;
+        map.repeat.set(width / 1024, height / 1536);
+        map.offset.set(x / 1024, 1 - (y + height) / 1536);
+        material.map = map; material.needsUpdate = true;
+        loaded = true;
+        // Size the plane to fill the same viewport as the fallback artwork.
+        camera.position.z = 1 / Math.tan(THREE.MathUtils.degToRad(15));
+        render(); motion();
+      });
+      dispose = () => {
+        stop(); resize.disconnect(); observer.disconnect();
+        el.removeEventListener('pointermove', move); el.removeEventListener('pointerleave', reset);
+        document.removeEventListener('visibilitychange', visibility); reduced.removeEventListener('change', motion);
+        renderer.domElement.removeEventListener('webglcontextlost', contextLost);
+        geometry.dispose(); material.dispose(); texture?.dispose(); renderer.dispose();
+        renderer.domElement.remove(); el.classList.remove('ln-gpu-ready');
+      };
+    }).catch(() => { /* The reference artwork remains visible if WebGL cannot load. */ });
+    return () => { cancelled = true; dispose?.(); };
+  }, [dark]);
+  return <div className="ln-scene" ref={host} role="img" aria-label="Ivory globe, suitcase and folded map with a coral travel route">
+    <Artwork name="hero" />
+  </div>;
 }
-TravelScene.propTypes={dark:PropTypes.bool};
+TravelScene.propTypes = { dark: PropTypes.bool };

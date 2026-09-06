@@ -1,15 +1,23 @@
-# New landing page
+# Redesigned landing page
 
-The new design is the default homepage at `/`. `/landing/new` redirects to `/`. The original design is preserved at `/landing/classic`, with LandingPage.jsx unchanged.
+The redesigned homepage is served at `/`; `/landing/new` redirects there. The original component remains unchanged and is available at `/landing/classic`.
 
-- `LandingNext.jsx`: independent page, navigation, feature cards, shared budgeting/collaboration section, Pro, pricing, footer.
-- `landing-next.css`: page-scoped styles for desktop/mobile and light/dark themes.
-- `TravelScene.jsx`: lazy-loaded Three.js globe, suitcase, and map; reduced-motion handling, offscreen pause, resize handling, cleanup, and WebGL fallback.
+## Visual assets and rendering
 
-Uses the existing Logo and AppContext theme and existing auth, AI-template, planning, payment, and support callbacks. Budget and member cards are illustrative previews; they do not modify trip data.
+`public/landing-art/light.jpg` and `dark.jpg` are the user's approved source renders, stored unchanged. `Artwork.jsx` selects illustration-only viewports with native SVG clipping. The hero, map, booking tray, place card, calendar, wallet, shared itinerary, boarding pass, notebook, camera, binoculars, luggage and tag therefore use the approved artwork rather than generic icon substitutes.
 
-The illustrations are code-rendered interpretations of the design mockups, not extracted raster assets. Three.js is only requested on the new page.
+Headings, feature descriptions, prices, expense totals, member controls, navigation and buttons are HTML. Expense and member preview regions in the source are masked and replaced with HTML; these remain illustrative examples, not live trip data. Actual actions use the app's existing callbacks.
 
-Validation: `npm run build`. The repository's existing ESLint config imports `eslint/config`, unavailable in its declared ESLint 8 dependency. Targeted React hook checks can run with ESLINT_USE_FLAT_CONFIG=false and explicit parser/environment options.
+`TravelScene.jsx` uses a Three.js textured plane for subtle pointer perspective on desktop. It intentionally preserves the rendered composition instead of approximating it with primitive geometry. Touch devices, reduced-motion users and WebGL failures use the same static SVG artwork. Geometry, textures, observers and listeners are cleaned up; rendering pauses offscreen or when stationary.
 
-To preview locally, run `npm run dev` and open `/`. Compare the original design at `/landing/classic`.
+Inter Latin 400/500/600/700 is bundled with `@fontsource/inter`, avoiding a network font dependency or platform-specific fallback. The existing route-and-pins `Logo` and AppContext theme remain shared with the application.
+
+## Validation
+
+- Production Vite build passes.
+- Targeted React hook lint checks pass (the root ESLint config has a pre-existing ESLint 8/config API mismatch).
+- Chromium screenshots inspected in light and dark mode at desktop and mobile widths.
+- Browser checks at 320, 390, 768 and 1440 pixels: no horizontal overflow or uncaught page errors, Inter loaded, all four features present, sign-in modal opens, classic page renders.
+- Desktop WebGL artwork loads; touch devices retain the static artwork.
+
+These source renders are 1024×1536 raster artwork, so their detail is finite when enlarged. The page is responsive HTML, not a full-page screenshot.
