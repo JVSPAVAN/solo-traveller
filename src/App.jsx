@@ -271,7 +271,7 @@ function App() {
       <Toast show={toast.show} message={toast.message} type={toast.type} onClose={() => setToast(prev => ({ ...prev, show: false }))} />
 
       {/* Top Navbar */}
-      {!/^\/landing\/new\/?$/i.test(location.pathname) && <Navbar
+      {location.pathname !== "/" && !/^\/landing\/new\/?$/i.test(location.pathname) && <Navbar
         onOpenAuth={() => toggleModal('auth', true)}
         onOpenTemplate={() => toggleModal('planType', true)}
         onSwitchView={handleSwitchView}
@@ -280,7 +280,8 @@ function App() {
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden', position: 'relative' }}>
         <Routes>
-          <Route path="/landing/new" element={
+          <Route path="/landing/new" element={<Navigate to="/" replace />} />
+          <Route path="/" element={
             <Suspense fallback={<div role="status" style={{ padding: 32 }}>Loading SoloTraveller…</div>}>
               <LandingNext
                 onStartPlanning={handleStartPlanning}
@@ -291,7 +292,7 @@ function App() {
               />
             </Suspense>
           } />
-          <Route path="/" element={
+          <Route path="/landing/classic" element={
             <div style={{ width: '100%', overflowY: 'auto' }}>
               <LandingPage
                 onStartPlanning={handleStartPlanning}

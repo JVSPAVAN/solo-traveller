@@ -1,6 +1,6 @@
 # New landing page
 
-Preview at `/landing/new`. The existing `/` page and LandingPage.jsx are preserved.
+The new design is the default homepage at `/`. `/landing/new` redirects to `/`. The original design is preserved at `/landing/classic`, with LandingPage.jsx unchanged.
 
 - `LandingNext.jsx`: independent page, navigation, feature cards, shared budgeting/collaboration section, Pro, pricing, footer.
 - `landing-next.css`: page-scoped styles for desktop/mobile and light/dark themes.
@@ -12,4 +12,4 @@ The illustrations are code-rendered interpretations of the design mockups, not e
 
 Validation: `npm run build`. The repository's existing ESLint config imports `eslint/config`, unavailable in its declared ESLint 8 dependency. Targeted React hook checks can run with ESLINT_USE_FLAT_CONFIG=false and explicit parser/environment options.
 
-No deployment or push is required to keep the original homepage available. To preview locally, run `npm run dev` and open `/landing/new`.
+To preview locally, run `npm run dev` and open `/`. Compare the original design at `/landing/classic`.
