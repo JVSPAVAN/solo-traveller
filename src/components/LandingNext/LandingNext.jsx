@@ -69,13 +69,15 @@ export default function LandingNext({ onStartPlanning, onOpenAuth, onOpenAI, onO
   useEffect(() => {
     const root = pageRef.current;
     const media = matchMedia('(prefers-reduced-motion: reduce)');
-    if (media.matches || !('IntersectionObserver' in window)) return;
+    if (!('IntersectionObserver' in window)) return;
+    // O(n) observed cards; only visible sections run decorative motion.
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) { entry.target.classList.add('ln-revealed'); observer.unobserve(entry.target); }
+        entry.target.classList.toggle('ln-in-view', entry.isIntersecting);
+        if (entry.isIntersecting && !media.matches) entry.target.classList.add('ln-revealed');
       });
     }, { root, threshold: 0.06 });
-    root.querySelectorAll('main > section, .ln-features article, .ln-plans > article, footer').forEach(node => observer.observe(node));
+    root.querySelectorAll('main > section, .ln-features article, .ln-shared-grid > article, .ln-plans > article, footer').forEach(node => observer.observe(node));
     return () => observer.disconnect();
   }, []);
   const [menu, setMenu] = useState(false);
@@ -160,7 +162,7 @@ export default function LandingNext({ onStartPlanning, onOpenAuth, onOpenAI, onO
           </details>
         </section>
         <section id="ln-pricing" className="ln-pricing">
-          <div className="ln-pricing-heading"><h2>Simple, transparent pricing</h2><RouteDoodle /><span className="ln-handwritten">Good journeys<br />ahead…</span></div>
+          <div className="ln-pricing-heading"><h2>Simple, transparent pricing</h2><RouteDoodle /><Artwork name="luggage" /><span className="ln-handwritten">Good journeys<br />ahead…</span></div>
           <div className="ln-plans">{PLANS.map(selected => <article key={selected.name} className={`${selected.name === 'Standard' ? 'ln-popular' : ''} ${plan === selected.name ? 'ln-plan-open' : ''}`}>
             {selected.name === 'Standard' && <span className="ln-badge">Most popular</span>}
             <h3><span className="ln-plan-desktop-name">{selected.name}</span><button className="ln-plan-toggle" aria-expanded={plan === selected.name} aria-controls={`ln-plan-${selected.name}`} onClick={() => setPlan(plan === selected.name ? null : selected.name)}>{selected.name}<span>{plan === selected.name ? '−' : '+'}</span></button></h3>
@@ -176,7 +178,7 @@ export default function LandingNext({ onStartPlanning, onOpenAuth, onOpenAI, onO
         <FooterGroup title="Product"><button onClick={onStartPlanning}>Planner</button><a href="#ln-together-heading">Budget Tracker</a><a href="#ln-features">Map View</a></FooterGroup>
         <FooterGroup title="Company"><button onClick={() => onOpenGeneric('support')}>Contact us</button><Link to="/landing/classic">Original design</Link></FooterGroup>
         <FooterGroup title="Support"><button onClick={() => onOpenGeneric('faq')}>Help Center</button><button onClick={() => onOpenGeneric('support')}>Support</button></FooterGroup>
-        <span className="ln-footer-note">Explore more.<br />Remember<br />forever.</span><p className="ln-copyright">© {new Date().getFullYear()} SoloTraveller Inc. All rights reserved.</p>
+        <Artwork name="tag" /><p className="ln-copyright">© {new Date().getFullYear()} SoloTraveller Inc. All rights reserved.</p>
       </div></footer>
     </div>
   </div>;

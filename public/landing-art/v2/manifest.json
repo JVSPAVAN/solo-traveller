@@ -53,5 +53,15 @@
     "width": 1536,
     "height": 1024,
     "alpha": true
+  },
+  "luggage": {
+    "width": 1536,
+    "height": 1024,
+    "alpha": true
+  },
+  "tag": {
+    "width": 1536,
+    "height": 1024,
+    "alpha": true
   }
 }

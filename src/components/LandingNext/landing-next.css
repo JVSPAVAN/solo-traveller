@@ -242,3 +242,52 @@
   .ln-plans ul { font-size: 15px; min-height: 0; }
   .ln-footer-note { display: none; }
 }
+/* Restore the reference's travel accessories without overlapping prices or copy. */
+.ln-pricing-heading { min-height: 205px; }
+.ln-pricing-heading h2 { max-width: 58%; }
+.ln-pricing-heading .ln-artwork-luggage { width: 29%; height: 170px; right: 12%; top: 18px; z-index: 1; }
+.ln-pricing-heading .ln-doodle { top: 74px; right: 7%; width: 48%; }
+.ln-pricing-heading .ln-handwritten { top: 40px; right: 0; max-width: 110px; }
+.ln-footer-inner { grid-template-columns: 2fr 1fr 1fr 1fr 1.55fr; }
+.ln-footer .ln-artwork-tag { width: 100%; height: 155px; margin-top: 0; align-self: center; }
+@media(min-width:761px) and (max-width:1000px) {
+  .ln-pricing-heading { min-height: 190px; }
+  .ln-pricing-heading .ln-artwork-luggage { width: 32%; right: 13%; height: 145px; top: 32px; }
+  .ln-pricing-heading .ln-handwritten { font-size: 18px; max-width: 90px; }
+  .ln-footer .ln-artwork-tag { height: 125px; }
+}
+@media(max-width:760px) {
+  .ln-pricing-heading { min-height: 0; }
+  .ln-pricing-heading h2 { max-width: 100%; }
+  .ln-pricing-heading .ln-artwork-luggage { display: none; }
+  .ln-footer .ln-artwork-tag { display: block; width: 160px; height: 112px; margin: 20px auto 0; }
+}
+/* Alpha-aware shadows ground objects without a rectangular image backdrop. */
+.ln-page { --ln-art-shadow: #53463230; --ln-art-contact: #49362126; }
+.ln-page[data-theme=dark] { --ln-art-shadow: #0008; --ln-art-contact: #0006; }
+.ln-artwork { filter: drop-shadow(0 16px 12px var(--ln-art-shadow)) drop-shadow(0 3px 3px var(--ln-art-contact)); opacity: 0; }
+.ln-artwork.ln-art-loaded { opacity: 1; }
+.ln-scene { filter: drop-shadow(0 20px 14px var(--ln-art-shadow)); }
+.ln-scene .ln-artwork { filter: none; }
+.ln-features article { background: radial-gradient(ellipse at 50% 60%, #d6e1ec30, transparent 65%), var(--ln-surface); }
+.ln-features .ln-artwork { margin-bottom: 16px; }
+.ln-shared-grid>article,.ln-plans>article { box-shadow: 0 6px 20px #14203806; }
+.ln-expense-card,.ln-members-card { box-shadow: 0 12px 28px #14203818, 0 2px 5px #1420380b; }
+.ln-footer .ln-artwork { filter: drop-shadow(0 13px 9px #0008); }
+@keyframes ln-route-flow { to { stroke-dashoffset: -48; } }
+@keyframes ln-art-arrive { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+@media(prefers-reduced-motion:no-preference) {
+  .ln-art-loaded { animation: ln-art-arrive .65s ease-out both; }
+  .ln-features article,.ln-plans>article,.ln-shared-grid>article { transition: transform .3s ease, box-shadow .3s ease; }
+  .ln-doodle path:first-child { animation: ln-route-flow 5s linear infinite; animation-play-state: paused; }
+  .ln-in-view > .ln-together-heading .ln-doodle path:first-child,
+  .ln-in-view > .ln-pricing-heading .ln-doodle path:first-child { animation-play-state: running; }
+}
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) {
+  .ln-features article:hover,.ln-plans>article:hover { transform: translateY(-5px); box-shadow: 0 18px 32px #14203812; }
+  .ln-shared-grid>article:hover { transform: translateY(-3px); }
+}
+@media(max-width:760px) {
+  .ln-artwork { filter: drop-shadow(0 9px 7px var(--ln-art-shadow)) drop-shadow(0 2px 2px var(--ln-art-contact)); }
+}
+.ln-scene.ln-gpu-ready>.ln-artwork { visibility: hidden; }
