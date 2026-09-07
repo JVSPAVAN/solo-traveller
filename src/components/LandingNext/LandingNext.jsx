@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import '@fontsource/inter/latin-400.css';
@@ -65,6 +65,19 @@ function ExpensePreview() {
 // Fixed marketing lists require O(n) rendering and DOM space for n cards.
 export default function LandingNext({ onStartPlanning, onOpenAuth, onOpenAI, onOpenPayment, onOpenGeneric }) {
   const { theme, toggleTheme, isLoggedIn } = useApp();
+  const pageRef = useRef(null);
+  useEffect(() => {
+    const root = pageRef.current;
+    const media = matchMedia('(prefers-reduced-motion: reduce)');
+    if (media.matches || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) { entry.target.classList.add('ln-revealed'); observer.unobserve(entry.target); }
+      });
+    }, { root, threshold: 0.06 });
+    root.querySelectorAll('main > section, .ln-features article, .ln-plans > article, footer').forEach(node => observer.observe(node));
+    return () => observer.disconnect();
+  }, []);
   const [menu, setMenu] = useState(false);
   const [plan, setPlan] = useState(null);
   const [benefitsOpen, setBenefitsOpen] = useState(() => matchMedia('(min-width: 761px)').matches);
@@ -81,7 +94,7 @@ export default function LandingNext({ onStartPlanning, onOpenAuth, onOpenAI, onO
   };
   const closeMenu = () => setMenu(false);
 
-  return <div className="ln-page" data-theme={theme}>
+  return <div ref={pageRef} className="ln-page" data-theme={theme}>
     <a className="ln-skip" href="#ln-main">Skip to content</a>
     <div className="ln-shell">
       <header className="ln-header">
@@ -147,7 +160,7 @@ export default function LandingNext({ onStartPlanning, onOpenAuth, onOpenAI, onO
           </details>
         </section>
         <section id="ln-pricing" className="ln-pricing">
-          <div className="ln-pricing-heading"><h2>Simple, transparent pricing</h2><RouteDoodle /><Artwork name="luggage" /></div>
+          <div className="ln-pricing-heading"><h2>Simple, transparent pricing</h2><RouteDoodle /><span className="ln-handwritten">Good journeys<br />ahead…</span></div>
           <div className="ln-plans">{PLANS.map(selected => <article key={selected.name} className={`${selected.name === 'Standard' ? 'ln-popular' : ''} ${plan === selected.name ? 'ln-plan-open' : ''}`}>
             {selected.name === 'Standard' && <span className="ln-badge">Most popular</span>}
             <h3><span className="ln-plan-desktop-name">{selected.name}</span><button className="ln-plan-toggle" aria-expanded={plan === selected.name} aria-controls={`ln-plan-${selected.name}`} onClick={() => setPlan(plan === selected.name ? null : selected.name)}>{selected.name}<span>{plan === selected.name ? '−' : '+'}</span></button></h3>
@@ -163,7 +176,7 @@ export default function LandingNext({ onStartPlanning, onOpenAuth, onOpenAI, onO
         <FooterGroup title="Product"><button onClick={onStartPlanning}>Planner</button><a href="#ln-together-heading">Budget Tracker</a><a href="#ln-features">Map View</a></FooterGroup>
         <FooterGroup title="Company"><button onClick={() => onOpenGeneric('support')}>Contact us</button><Link to="/landing/classic">Original design</Link></FooterGroup>
         <FooterGroup title="Support"><button onClick={() => onOpenGeneric('faq')}>Help Center</button><button onClick={() => onOpenGeneric('support')}>Support</button></FooterGroup>
-        <Artwork name="tag" /><p className="ln-copyright">© {new Date().getFullYear()} SoloTraveller Inc. All rights reserved.</p>
+        <span className="ln-footer-note">Explore more.<br />Remember<br />forever.</span><p className="ln-copyright">© {new Date().getFullYear()} SoloTraveller Inc. All rights reserved.</p>
       </div></footer>
     </div>
   </div>;

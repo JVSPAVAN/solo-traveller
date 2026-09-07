@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Artwork, { ART } from './Artwork';
 
 // The approved art is a textured plane, not a simplified replacement 3D model.
-// Three.js supplies restrained perspective motion; the SVG stays as the fallback.
+// Three.js supplies restrained perspective motion; the responsive image stays as the fallback.
 export default function TravelScene({ dark }) {
   const host = useRef(null);
   useEffect(() => {
@@ -23,7 +23,7 @@ export default function TravelScene({ dark }) {
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(30, 1, .1, 20);
       camera.position.z = 4;
-      const [x, y, width, height] = ART.hero;
+      const [width, height] = ART.hero;
       const geometry = new THREE.PlaneGeometry(width / height * 2, 2);
       const material = new THREE.MeshBasicMaterial({ transparent: true, toneMapped: false });
       const plane = new THREE.Mesh(geometry, material);
@@ -71,15 +71,13 @@ export default function TravelScene({ dark }) {
       el.addEventListener('pointerleave', reset);
       document.addEventListener('visibilitychange', visibility);
       reduced.addEventListener('change', motion);
-      texture = new THREE.TextureLoader().load(`/landing-art/${dark ? 'dark' : 'light'}.jpg`, map => {
+      texture = new THREE.TextureLoader().load(`/landing-art/v2/hero-1536.webp`, map => {
         if (cancelled) { map.dispose(); return; }
         map.colorSpace = THREE.SRGBColorSpace;
-        map.repeat.set(width / 1024, height / 1536);
-        map.offset.set(x / 1024, 1 - (y + height) / 1536);
         material.map = map; material.needsUpdate = true;
         loaded = true;
         // Size the plane to fill the same viewport as the fallback artwork.
-        camera.position.z = 1 / Math.tan(THREE.MathUtils.degToRad(15));
+        camera.position.z = Math.max(1, (width / height) / camera.aspect) / Math.tan(THREE.MathUtils.degToRad(15));
         render(); motion();
       });
       dispose = () => {

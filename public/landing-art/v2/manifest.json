@@ -1,0 +1,57 @@
+{
+  "hero": {
+    "width": 1536,
+    "height": 1024,
+    "alpha": true
+  },
+  "ticket": {
+    "width": 1672,
+    "height": 941,
+    "alpha": true
+  },
+  "notebook": {
+    "width": 1672,
+    "height": 941,
+    "alpha": true
+  },
+  "camera": {
+    "width": 1672,
+    "height": 941,
+    "alpha": true
+  },
+  "binoculars": {
+    "width": 1672,
+    "height": 941,
+    "alpha": true
+  },
+  "mapping": {
+    "width": 1672,
+    "height": 941,
+    "alpha": true
+  },
+  "import": {
+    "width": 1672,
+    "height": 941,
+    "alpha": true
+  },
+  "place": {
+    "width": 1536,
+    "height": 1024,
+    "alpha": true
+  },
+  "ai": {
+    "width": 1536,
+    "height": 1024,
+    "alpha": true
+  },
+  "budget": {
+    "width": 1536,
+    "height": 1024,
+    "alpha": true
+  },
+  "collaboration": {
+    "width": 1536,
+    "height": 1024,
+    "alpha": true
+  }
+}
