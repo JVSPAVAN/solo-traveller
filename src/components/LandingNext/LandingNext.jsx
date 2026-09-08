@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '@fontsource/inter/latin-400.css';
 import '@fontsource/inter/latin-500.css';
 import '@fontsource/inter/latin-600.css';
@@ -67,6 +67,14 @@ function ExpensePreview() {
 export default function LandingNext({ onStartPlanning, onOpenAuth, onOpenAI, onOpenPayment, onOpenGeneric }) {
   const { theme, toggleTheme, isLoggedIn } = useApp();
   const pageRef = useRef(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (location.state?.openAI) {
+      navigate(location.pathname, { replace: true, state: null });
+      onOpenAI();
+    }
+  }, [location, navigate, onOpenAI]);
   useEffect(() => {
     const root = pageRef.current;
     const media = matchMedia('(prefers-reduced-motion: reduce)');

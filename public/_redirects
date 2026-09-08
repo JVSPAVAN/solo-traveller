@@ -1,0 +1,7 @@
+/landing/new /index.html 200
+/landing/classic /index.html 200
+/app /index.html 200
+/app/trips /index.html 200
+/app/budget /index.html 200
+/app/account /index.html 200
+/app/itinerary/* /index.html 200
