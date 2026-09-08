@@ -1,0 +1,12 @@
+#brand-splash{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;overflow:hidden;background:#fff;color:#f05c5c;transition:opacity .4s,visibility .4s;font-family:Arial,sans-serif}
+[data-theme="dark"] #brand-splash{background:#171c22}
+#brand-splash.fade-out{opacity:0;visibility:hidden;pointer-events:none}
+#brand-splash .stage{width:520px;text-align:center;transform-origin:center}
+#brand-splash .stage>svg{width:420px;height:420px;display:block;margin:auto}
+#brand-splash .wordmark-wrap{position:relative;width:max-content;margin:auto}
+#brand-splash #wordmark{font-size:44px;letter-spacing:-1.7px;line-height:1.2;margin:4px 0 0;font-weight:700;white-space:nowrap}
+#brand-splash #wordmark span{display:inline-block}
+#brand-splash .car{position:absolute;width:96px;height:56px;left:0;top:0;opacity:0;margin:0;overflow:visible}
+#brand-splash .splash-skip{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);padding:12px 20px;border:1px solid currentColor;border-radius:24px;background:transparent;color:inherit;font:500 14px Arial,sans-serif;cursor:pointer}
+#brand-splash .splash-skip:focus-visible{outline:3px solid currentColor;outline-offset:4px}
+@media(prefers-reduced-motion:reduce){#brand-splash{transition:none}}

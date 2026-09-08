@@ -217,64 +217,6 @@ body.no-scroll {
   z-index: 1;
 }
 
-#splash-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #fff;
-  z-index: 15000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.8s, visibility 0.8s;
-}
-
-[data-theme="dark"] #splash-screen {
-  background: #121212;
-}
-
-#splash-screen.fade-out {
-  opacity: 0;
-  visibility: hidden;
-}
-
-.splash-logo {
-  font-size: 3rem;
-  font-weight: 800;
-  color: var(--primary-orange);
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.splash-loader {
-  margin-top: 20px;
-  width: 40px;
-  height: 4px;
-  background: #eee;
-  border-radius: 2px;
-  overflow: hidden;
-  position: relative;
-}
-
-.splash-loader::after {
-  content: '';
-  position: absolute;
-  width: 0%;
-  height: 100%;
-  background: var(--primary-orange);
-  animation: loadBar 2s ease-in-out forwards;
-}
-
-@keyframes loadBar {
-  to {
-    width: 100%;
-  }
-}
-
 /* --- NAVBAR --- */
 .top-navbar {
   height: 60px;

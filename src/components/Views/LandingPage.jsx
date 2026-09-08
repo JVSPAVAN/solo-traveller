@@ -187,7 +187,7 @@ const LandingPage = ({ onStartPlanning, onOpenGeneric, onOpenAuth, onOpenPayment
                     <footer className="main-footer">
                         <div className="footer-content">
                             <div className="footer-col" style={{ flex: 1.5 }}>
-                                <h4 style={{ color: 'var(--primary-orange)', display: 'flex', alignItems: 'center', gap: '8px' }}><i className="fa-solid fa-route"></i> SoloTraveller</h4>
+                                <h4 style={{ color: 'var(--primary-orange)', display: 'flex', alignItems: 'center', gap: '8px' }}><Logo width="28px" height="28px" /> SoloTraveller</h4>
                                 <p style={{ color: '#9ca3af', fontSize: '0.9rem', lineHeight: 1.6 }}>Your ultimate companion for exploring the world. Plan, track, and share your adventures with ease.</p>
                             </div>
                             <div className={`footer-col accordion-col ${activeAccordion === 'product' ? 'active' : ''}`}>
