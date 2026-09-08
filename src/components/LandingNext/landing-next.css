@@ -328,3 +328,31 @@
  .ln-pricing-heading .ln-doodle,.ln-pricing-heading .ln-handwritten { display: none; }
  .ln-plans { margin-top: 0; }
 }
+
+/* Account access remains visible independently of the collapsed mobile navigation. */
+.ln-header { position: relative; z-index: 10; }
+.ln-page .ln-login { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; min-height: 44px; padding: 8px 16px; border: 1px solid var(--ln-accent); border-radius: 7px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.ln-account { position: relative; flex-shrink: 0; }
+.ln-page .ln-profile-trigger { display: flex; align-items: center; gap: 7px; padding: 0; min-height: 44px; }
+.ln-profile-avatar { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--ln-accent); color: #fff; font-size: 14px; font-weight: 600; }
+.ln-profile-trigger>i { font-size: 10px; }
+.ln-account-panel { position: absolute; top: calc(100% + 10px); right: 0; width: min(290px,calc(100vw - 32px)); max-height: min(580px,70dvh); overflow: auto; background: var(--ln-card); border: 1px solid var(--ln-line); border-radius: 12px; box-shadow: 0 12px 40px #0002; padding: 8px; text-align: left; }
+.ln-account-identity { display: flex; flex-direction: column; gap: 4px; padding: 12px; border-bottom: 1px solid var(--ln-line); overflow-wrap: anywhere; }
+.ln-account-identity strong { font-size: 15px; }.ln-account-identity span,.ln-account-identity small { color: var(--ln-muted); font-size: 12px; }
+.ln-account-panel nav { display: flex; flex-direction: column; margin-top: 6px; }
+.ln-account-panel nav :is(a,button) { display: block; min-height: 44px; padding: 11px 12px; border-radius: 6px; text-align: left; font-size: 14px; }
+.ln-account-panel nav :is(a,button):hover { background: var(--ln-surface); }
+.ln-account-panel .ln-signout { color: var(--ln-accent); border-top: 1px solid var(--ln-line); margin-top: 4px; }
+@media(max-width:760px) {
+ .ln-header { padding: 12px; gap: 7px; }
+ .ln-header .ln-brand { font-size: 18px; letter-spacing: -.8px; gap: 3px; }
+ .ln-header .ln-brand svg { width: 25px; height: 25px; }
+ .ln-header .ln-theme>i { display: none; }
+ .ln-header .ln-theme { margin-left: auto; }
+ .ln-header>a { margin-right: 0; }
+ .ln-page .ln-login { font-size: 12px; padding: 8px; }
+ .ln-profile-avatar { width: 34px; height: 34px; font-size: 12px; }
+ .ln-profile-trigger>i { display: none; }
+ .ln-menu { width: 24px; min-height: 44px; }
+ .ln-account-panel { right: -31px; }
+}

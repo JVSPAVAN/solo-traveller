@@ -9,6 +9,7 @@ import { useApp } from '../../context/AppContext';
 import Logo from '../Shared/Logo';
 import TravelScene from './TravelScene';
 import Artwork from './Artwork';
+import AccountControl from './AccountControl';
 import './landing-next.css';
 
 const FEATURES = [
@@ -109,7 +110,7 @@ export default function LandingNext({ onStartPlanning, onOpenAuth, onOpenAI, onO
         <button className="ln-theme" onClick={toggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`} aria-pressed={theme === 'dark'}>
           <Icon name="sun" /><span className="ln-switch"><span /></span><Icon name="moon" />
         </button>
-        <button className="ln-signin" onClick={isLoggedIn ? onStartPlanning : onOpenAuth}>{isLoggedIn ? 'My planner' : 'Sign in'}</button>
+        <AccountControl onOpenAuth={onOpenAuth} onOpenGeneric={onOpenGeneric} />
         <button className="ln-menu" aria-label="Toggle navigation" aria-controls="ln-navigation" aria-expanded={menu} onClick={() => setMenu(!menu)}><Icon name={menu ? 'xmark' : 'bars'} /></button>
       </header>
       <main id="ln-main" className="ln-main">
