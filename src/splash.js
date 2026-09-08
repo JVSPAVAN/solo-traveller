@@ -27,7 +27,7 @@ const draw=t=>{
  // Solo appears together; each trailing letter appears only after the car passes it.
  const letters=Array.from($('wordmark').children),bounds={left:0,width:$('wordmark').offsetWidth};
  const soloRight=letters[3].offsetLeft+letters[3].offsetWidth;
- const drive=clamp((t-7.15)/2.4),distance=bounds.width-soloRight+58;
+ const drive=clamp((t-7.15)/2.4),distance=bounds.width-soloRight+16;
  const carX=soloRight-4+distance*drive;
  letters.forEach((letter,i)=>{const edge=letter.offsetLeft+letter.offsetWidth;letter.style.visibility=t>=6.7&&(i<4||(t>=7.15&&edge<carX-5))?'visible':'hidden';});
  const carVisible=ease((t-7.0)/.2)*(1-ease((t-9.52)/.4));
@@ -50,8 +50,8 @@ function remove(){
 function appReady(){ready=true;remove();}
 function reduceMotion(){if(motion.matches){draw(10.3);done=true;remove();}}
 const resize=new ResizeObserver(()=>{
- const scale=Math.min(1,(innerWidth-32)/520,(innerHeight-110)/490);
- splash.querySelector('.stage').style.transform=`scale(${Math.max(.3,scale)})`;
+ const scale=Math.min(1,(splash.clientWidth-32)/640,(splash.clientHeight-110)/490);
+ splash.querySelector('.stage').style.transform=`translate(-50%,-50%) scale(${Math.max(.2,scale)})`;
 });
 resize.observe(splash);
 window.addEventListener('solo-app-ready',appReady);

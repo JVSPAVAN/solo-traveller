@@ -155,14 +155,14 @@ export default function LandingNext({ onStartPlanning, onOpenAuth, onOpenAI, onO
           </div>
         </section>
         <section id="ln-pro" className="ln-pro">
-          <div className="ln-pro-copy"><p className="ln-eyebrow">SoloTraveller Pro</p><h2>Maximize your trip<br />planning with Pro.</h2><p>Powerful tools for a smoother journey.</p><Artwork name="ticket" /></div>
+          <div className="ln-pro-copy"><div className="ln-pro-heading"><p className="ln-eyebrow">SoloTraveller Pro</p><h2>Maximize your trip<br />planning with Pro.</h2><p>Powerful tools for a smoother journey.</p></div><Artwork name="ticket" /></div>
           <details className="ln-benefits" open={benefitsOpen} onToggle={event => setBenefitsOpen(event.currentTarget.open)}>
             <summary>Explore Pro benefits <span>+</span></summary>
             <div>{BENEFITS.map(([icon, title, body]) => <article key={title}><span><Icon name={icon} /></span><div><h3>{title}</h3><p>{body}</p></div></article>)}</div>
           </details>
         </section>
         <section id="ln-pricing" className="ln-pricing">
-          <div className="ln-pricing-heading"><h2>Simple, transparent pricing</h2><RouteDoodle /><Artwork name="luggage" /><span className="ln-handwritten">Good journeys<br />ahead…</span></div>
+          <div className="ln-pricing-heading"><h2>Simple, transparent pricing</h2><div className="ln-pricing-visual"><RouteDoodle /><Artwork name="luggage" /><span className="ln-handwritten">Good journeys<br />ahead…</span></div></div>
           <div className="ln-plans">{PLANS.map(selected => <article key={selected.name} className={`${selected.name === 'Standard' ? 'ln-popular' : ''} ${plan === selected.name ? 'ln-plan-open' : ''}`}>
             {selected.name === 'Standard' && <span className="ln-badge">Most popular</span>}
             <h3><span className="ln-plan-desktop-name">{selected.name}</span><button className="ln-plan-toggle" aria-expanded={plan === selected.name} aria-controls={`ln-plan-${selected.name}`} onClick={() => setPlan(plan === selected.name ? null : selected.name)}>{selected.name}<span>{plan === selected.name ? '−' : '+'}</span></button></h3>

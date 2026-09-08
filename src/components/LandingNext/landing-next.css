@@ -291,3 +291,40 @@
   .ln-artwork { filter: drop-shadow(0 9px 7px var(--ln-art-shadow)) drop-shadow(0 2px 2px var(--ln-art-contact)); }
 }
 .ln-scene.ln-gpu-ready>.ln-artwork { visibility: hidden; }
+
+/* Keep heading artwork in normal flow: fixed-size grids, O(1) layout per section. */
+.ln-pro { display: grid; grid-template-columns: minmax(0,1fr); gap: 24px; padding: 32px 36px; }
+.ln-pro-copy { display: grid; grid-template-columns: minmax(0,1fr) minmax(180px,30%); align-items: center; gap: 24px; padding: 0; min-height: 0; }
+.ln-pro-heading { min-width: 0; }
+.ln-pro .ln-eyebrow { margin-bottom: 10px; }
+.ln-pro .ln-artwork-ticket { position: static; display: block; width: 100%; height: 160px; margin: 0; }
+.ln-pricing { padding-top: 40px; }
+.ln-pricing-heading { display: grid; grid-template-columns: minmax(0,1fr) minmax(280px,44%); gap: 24px; align-items: center; min-height: 0; padding: 0; margin-bottom: 28px; }
+.ln-pricing-heading h2 { max-width: none; margin: 0; }
+.ln-pricing-visual { position: relative; display: grid; grid-template-columns: minmax(0,1fr) 100px; align-items: center; gap: 24px; min-width: 0; }
+.ln-pricing-heading .ln-artwork-luggage { position: static; display: block; width: 100%; height: 150px; margin: 0; z-index: 1; }
+.ln-pricing-heading .ln-handwritten { position: static; display: block; max-width: none; font-size: 20px; line-height: 1.4; }
+/* The arrow is confined to the artwork column, with a separate text column. */
+.ln-pricing-heading .ln-doodle { display: block; top: 44%; left: 0; right: auto; width: calc(100% - 124px); }
+@media(min-width:1100px) { .ln-benefits>div { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media(max-width:1000px) and (min-width:761px) {
+ .ln-pro .ln-artwork-ticket { height: 140px; }
+ .ln-pricing-heading { grid-template-columns: minmax(0,1fr) minmax(270px,44%); gap: 16px; }
+ .ln-pricing-visual { grid-template-columns: minmax(0,1fr) 84px; gap: 18px; }
+ .ln-pricing-heading .ln-artwork-luggage { height: 125px; }
+ .ln-pricing-heading .ln-handwritten { font-size: 18px; }
+ .ln-pricing-heading .ln-doodle { width: calc(100% - 102px); }
+}
+@media(max-width:760px) {
+ .ln-pro { padding: 24px 16px; gap: 16px; }
+ .ln-pro-copy { grid-template-columns: minmax(0,1fr) 90px; gap: 12px; align-items: start; }
+ .ln-pro h2 { font-size: clamp(24px,6vw,32px); }
+ .ln-pro .ln-artwork-ticket { height: 100px; margin-top: 16px; }
+ .ln-pro-heading>p:last-child { margin-top: 12px; }
+ .ln-pricing-heading { grid-template-columns: minmax(0,1fr) 96px; gap: 12px; margin-bottom: 20px; }
+ .ln-pricing-heading h2 { font-size: clamp(25px,6vw,32px); }
+ .ln-pricing-visual { display: block; }
+ .ln-pricing-heading .ln-artwork-luggage { height: 90px; }
+ .ln-pricing-heading .ln-doodle,.ln-pricing-heading .ln-handwritten { display: none; }
+ .ln-plans { margin-top: 0; }
+}

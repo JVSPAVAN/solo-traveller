@@ -1,7 +1,7 @@
 #brand-splash{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;overflow:hidden;background:#fff;color:#f05c5c;transition:opacity .4s,visibility .4s;font-family:Arial,sans-serif}
 [data-theme="dark"] #brand-splash{background:#171c22}
 #brand-splash.fade-out{opacity:0;visibility:hidden;pointer-events:none}
-#brand-splash .stage{width:520px;text-align:center;transform-origin:center}
+#brand-splash .stage{position:absolute;left:50%;top:46%;width:640px;text-align:center;transform-origin:center;transform:translate(-50%,-50%)}
 #brand-splash .stage>svg{width:420px;height:420px;display:block;margin:auto}
 #brand-splash .wordmark-wrap{position:relative;width:max-content;margin:auto}
 #brand-splash #wordmark{font-size:44px;letter-spacing:-1.7px;line-height:1.2;margin:4px 0 0;font-weight:700;white-space:nowrap}
