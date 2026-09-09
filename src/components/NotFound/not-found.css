@@ -5,11 +5,11 @@
 .nf-scene { position:relative;aspect-ratio:2;isolation:isolate;overflow:hidden;border-radius:16px;background:#fffaf5; }
 .nf-backdrop { width:100%;height:100%;display:block; }
 .nf-traveler { position:absolute;width:22.5%;height:90%;left:43%;bottom:8%; }
-.nf-pose { clip-path:inset(0 3%);position:absolute;inset:0;background-image:url('/not-found/traveler.webp');background-size:400% 100%;opacity:0;animation:nf-pose 12s linear infinite; }
-.nf-pose-0 { background-position:0% 0;animation-delay:-.3s; }
-.nf-pose-1 { background-position:33.333% 0;animation-delay:-9.3s; }
-.nf-pose-2 { background-position:66.666% 0;animation-delay:-6.3s; }
-.nf-pose-3 { background-position:100% 0;animation-delay:-3.3s; }
+.nf-pose { clip-path:inset(0 3%);position:absolute;inset:0;background-image:url('/not-found/traveler.webp');background-size:400% 100%;opacity:0;animation:nf-pose 4s linear infinite; }
+.nf-pose-0 { background-position:0% 0;animation-delay:-.1s; }
+.nf-pose-1 { background-position:33.333% 0;animation-delay:-3.1s; }
+.nf-pose-2 { background-position:66.666% 0;animation-delay:-2.1s; }
+.nf-pose-3 { background-position:100% 0;animation-delay:-1.1s; }
 .nf-cloud { position:absolute;width:12%;height:5%;top:21%;left:8%;background:#f2e6db;border-radius:60px;filter:blur(1px);opacity:.75;animation:nf-cloud 16s ease-in-out infinite alternate; }
 .nf-cloud::before,.nf-cloud::after { content:'';position:absolute;background:inherit;border-radius:50%;width:42%;height:190%;left:15%;bottom:0; }
 .nf-cloud::after { width:34%;height:150%;left:50%; }
