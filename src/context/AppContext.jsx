@@ -9,6 +9,7 @@ export const AppProvider = ({ children }) => {
     const [user, setUser] = useState(null); // { name: "John Doe", email: "..." }
     const [currentTripData, setCurrentTripData] = useState(null);
     const [myTrips, setMyTrips] = useState([]);
+    const [tripsStatus, setTripsStatus] = useState('loading');
     const [userPlan, setUserPlan] = useState('free'); // 'free', 'standard', 'pro'
     const [theme, setTheme] = useState('light');
 
@@ -24,9 +25,12 @@ export const AppProvider = ({ children }) => {
 
     // Fetch trips when logged in
     useEffect(() => {
+        let active = true;
         if (isLoggedIn) {
+            setTripsStatus('loading');
             getTrips()
                 .then(data => {
+                    if (!active) return;
                     const formattedTrips = data.map(trip => ({
                         ...trip,
                         id: trip._id,
@@ -36,11 +40,14 @@ export const AppProvider = ({ children }) => {
                         isUpcoming: new Date(trip.start_date || Date.now()) > new Date()
                     }));
                     setMyTrips(formattedTrips);
+                    setTripsStatus('ready');
                 })
-                .catch(err => console.error("Failed to load trips", err));
+                .catch(err => { if (active) setTripsStatus('error'); console.error("Failed to load trips", err); });
         } else {
             setMyTrips([]);
+            setTripsStatus('idle');
         }
+        return () => { active = false; };
     }, [isLoggedIn]);
 
     const toggleTheme = () => {
@@ -251,6 +258,7 @@ export const AppProvider = ({ children }) => {
             currentTripData,
             setCurrentTripData,
             myTrips,
+            tripsStatus,
             theme,
             toggleTheme,
             login,
