@@ -33,21 +33,20 @@ export default function NotFound({ unavailable = false }) {
   return <div className="ln-page nf-page" data-theme={theme}>
     <a className="ln-skip" href="#nf-main">Skip to content</a>
     <header className="ln-header nf-header">
-      <Link to="/" aria-label="SoloTraveller home"><span className="ln-brand"><Logo width="36" height="36" />SoloTraveller</span></Link>
+      <Link to="/" aria-label="SoloTraveller home"><span className="ln-brand"><Logo width="36" height="36" /><span>SoloTraveller</span></span></Link>
       <button className="ln-outline nf-ai" onClick={ai}>✦ AI Assistant</button>
-      <button className="ln-theme" onClick={toggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`} aria-pressed={theme === 'dark'}><span className="ln-switch"><span /></span></button>
+      <button className="ln-theme" onClick={toggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`} aria-pressed={theme === 'dark'}><svg className="nf-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg><span className="ln-switch"><span /></span><svg className="nf-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.3A9 9 0 0 1 8.7 3.5a9 9 0 1 0 11.8 11.8Z" fill="currentColor"/></svg></button>
       <AccountControl onOpenAuth={() => setAuth(true)} onOpenGeneric={setGeneric} />
     </header>
     <main id="nf-main">
       <div className="nf-scene" data-paused={paused || hidden || reduced} aria-label="404: a lost traveler checks his map beside his suitcase" role="img">
         <img className="nf-backdrop" src="/not-found/scene.webp" width="1440" height="720" alt="" fetchPriority="high" />
         <span className="nf-cloud nf-cloud-one" /><span className="nf-cloud nf-cloud-two" />
-        <svg className="nf-route" viewBox="0 0 1000 150" fill="none" aria-hidden="true"><path d="M180 25C-30 35 20 140 220 105S470 45 690 105S930 100 970 35" stroke="currentColor" strokeWidth="2" strokeDasharray="7 8"/><path d="m958 31 31-10-12 28-6-12z" fill="currentColor" /></svg>
+        <svg className="nf-route" viewBox="0 0 1000 150" fill="none" aria-hidden="true"><path d="M180 25C-30 35 20 140 220 105S470 45 690 105S915 105 940 67" stroke="currentColor" strokeWidth="2" strokeDasharray="7 8"/><g className="nf-paper-plane"><path d="M905 39 988 10 961 84 941 58Z" fill="currentColor"/><path d="m941 58 47-48-36 58-11-10Z" fill="#d64148"/><path d="m941 58 2 22 9-12" fill="#ef8585"/><path d="m914 40 29 12 35-33" stroke="#ffb3a8" strokeWidth="2"/></g></svg>
         <div className="nf-traveler" aria-hidden="true">{[0,1,2,3].map(pose => <span key={pose} className={`nf-pose nf-pose-${pose}`} />)}</div>
       </div>
       <div className="nf-copy"><p className="nf-code">{unavailable ? 'Page unavailable' : '404 · Page not found'}</p><h1>Looks like we took a wrong turn.</h1><p>{unavailable ? 'We couldn’t load this page. Please try again in a moment.' : 'This page is off the map. Let’s get you back on track.'}</p>
-        <Link className="ln-primary" to="/">← Back to home</Link>
-        <button className="nf-back" onClick={() => window.history.state?.idx > 0 ? navigate(-1) : navigate('/', { replace: true })}>Go back</button>
+        <Link className="ln-primary nf-home" to="/"><span className="nf-home-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m10 5-7 7 7 7M3 12h18" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/></svg></span>Back to home</Link>
       </div>
       <footer className="nf-foot"><span>Your next adventure is still out there.</span>{!reduced && <button onClick={() => setPaused(value => !value)} aria-pressed={paused}>{paused ? 'Resume animation' : 'Pause animation'}</button>}</footer>
     </main>
