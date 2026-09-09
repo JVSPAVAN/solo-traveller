@@ -74,8 +74,8 @@
 .nf-beam { fill:#fff0ac;opacity:.17;filter:blur(6px);mix-blend-mode:screen; }
 .nf-lamp { filter:drop-shadow(0 0 9px #fff3bc); }
 
-/* 48 generated cells / 4 seconds = 12 fps, O(1) DOM and no React frame updates. */
-.nf-traveler-48 { width:44%;height:88%;left:33%;bottom:8%;background:url(/not-found/traveler-48-light.webp) 0 0/800% 600%;animation:nf-frames-48 4s steps(1,end) infinite; }
+/* 48 generated cells / 2 seconds = 24 fps, O(1) DOM and no React frame updates. */
+.nf-traveler-48 { width:36%;height:72%;left:37%;bottom:10%;background:url(/not-found/traveler-48-light.webp) 0 0/800% 600%;animation:nf-frames-48 2s steps(1,end) infinite; }
 .nf-page[data-theme=dark] .nf-traveler-48 {background-image:url(/not-found/traveler-48-dark.webp);}
 @keyframes nf-frames-48 {
 0.000000% {background-position:0.000000% 0.000000%;}
@@ -129,3 +129,6 @@
 100%{background-position:0 0;}
 }
 @media(prefers-reduced-motion:reduce){.nf-traveler-48{animation:none!important;background-position:0 0;}}
+
+/* Keep the artwork near its native detail while preserving the complete scene. */
+.nf-page .nf-scene { max-width:1200px;margin-left:auto;margin-right:auto; }
