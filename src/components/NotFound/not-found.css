@@ -25,7 +25,7 @@
 .nf-foot { display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;padding:24px;font-size:12px;color:var(--ln-muted); }
 .nf-foot button { text-decoration:underline;min-height:44px; }
 .nf-page[data-theme=dark] { background:var(--ln-bg); }
-.nf-page[data-theme=dark] .nf-scene { margin:12px 24px 24px; }
+
 .nf-scene[data-paused=true] * { animation-play-state:paused!important; }
 @keyframes nf-cloud { from{transform:translateX(-20%)}to{transform:translateX(30%)} }
 @keyframes nf-route { to{stroke-dashoffset:-180} }
@@ -35,7 +35,7 @@
  .nf-header{flex-wrap:wrap}.nf-header .nf-ai{font-size:12px;padding:8px;margin-left:auto}.nf-header .ln-brand{font-size:18px}
  .nf-scene{margin:24px 0;aspect-ratio:2}.nf-backdrop{position:static;width:100%;height:100%;object-fit:contain}
  .nf-traveler{width:22.5%;height:90%;left:43%;bottom:8%}.nf-cloud-one{top:19%}.nf-cloud-two{top:25%}
- .nf-copy>p{font-size:16px}.nf-foot{gap:4px;flex-direction:column}.nf-page[data-theme=dark] .nf-scene{margin:16px 8px 24px}
+ .nf-copy>p{font-size:16px}.nf-foot{gap:4px;flex-direction:column}
 }
 @media(max-width:420px){.nf-header .nf-ai{order:4;width:100%;margin-top:4px}.nf-header .ln-theme{margin-left:auto}}
 
@@ -75,7 +75,7 @@
 .nf-lamp { filter:drop-shadow(0 0 9px #fff3bc); }
 
 /* 48 generated cells / 2 seconds = 24 fps, O(1) DOM and no React frame updates. */
-.nf-traveler-48 { width:36%;height:72%;left:37%;bottom:10%;background:url(/not-found/traveler-48-light.webp) 0 0/800% 600%;animation:nf-frames-48 2s steps(1,end) infinite; }
+.nf-traveler-48 { width:36%;height:72%;left:37%;bottom:10%;background:url(/not-found/traveler-48-light.webp) 0 0/800% 600%;animation:nf-frames-48 4s steps(1,end) infinite; }
 .nf-page[data-theme=dark] .nf-traveler-48 {background-image:url(/not-found/traveler-48-dark.webp);}
 @keyframes nf-frames-48 {
 0.000000% {background-position:0.000000% 0.000000%;}
