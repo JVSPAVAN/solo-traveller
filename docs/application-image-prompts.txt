@@ -1,0 +1,199 @@
+SOLOTRAVELLER — IMAGE AND ANIMATION PROMPT REFERENCE
+Updated: 2026-09-17
+
+PROVENANCE
+The original image-generation tool prompts were not preserved in the repository
+and could not be recovered verbatim from available conversation history.
+Sections 1–4 below are RECONSTRUCTED reusable prompts based on the actual
+application artwork and documented design. They are not claimed to be the exact
+historical prompts. Section 5 preserves the user's animation directions;
+section 6 records the exact background-removal prompts used in this update.
+Use the corresponding existing artwork as a reference to preserve identity,
+composition, materials and colors; text prompts alone cannot reproduce it exactly.
+
+1. SHARED ART DIRECTION — RECONSTRUCTED
+Premium, friendly, stylized 3D travel illustration for SoloTraveller. Soft ivory
+and warm cream surfaces, coral-red accents, restrained warm metallic details,
+rounded forms, tactile matte materials, gentle studio lighting, soft ambient
+occlusion, clean silhouettes, polished miniature-object aesthetic. Match the
+provided reference artwork. Create standalone objects on a transparent alpha
+background, with generous clear margins and no clipped edges. No website UI,
+borders, watermarks, extra branding or unrequested typography. Do not bake a
+page background into an isolated illustration. Keep UI text and controls in HTML.
+Generate at the highest supported native resolution; do not describe upscaled
+or smaller outputs as native 4K.
+
+2. LANDING-PAGE ASSETS — RECONSTRUCTED
+Apply the shared art direction to each prompt separately. Filenames refer to
+public/landing-art/v2/. The -480.webp versions are responsive exports of the
+same illustration, not separately generated compositions. Recorded native
+sizes are in public/landing-art/v2/manifest.json.
+
+hero-1536.webp (1536 x 1024)
+A cream globe with subtle beige continents, coral destination pins connected
+by a coral dotted travel route, an upright ivory ribbed suitcase with coral
+handle and trim, and a small folded ivory map in front. Cohesive three-quarter
+composition, objects grounded together, transparent background.
+
+mapping-1672.webp (1672 x 941)
+An unfolded ivory city map with miniature cream buildings, small green trees,
+a pale blue winding river and bridges. A large coral location pin rises above
+the map, with a dotted coral route connecting destinations. Isometric view,
+precise clean miniature detail, transparent background.
+
+import-1672.webp (1672 x 941)
+An ivory desk inbox holding travel tickets and booking cards marked with coral
+airplane and calendar symbols. A coral downward arrow floats above the inbox
+to communicate importing reservations. Compact three-quarter composition,
+transparent background, no interface screenshot or tiny illegible text.
+
+place-1536.webp (1536 x 1024)
+A cream rounded place-details card beside a small photographic-style inset of
+a white-and-blue Mediterranean coastal village. A glossy coral location pin
+sits prominently on the card, with subtle raised neutral lines representing
+metadata. Standalone 3D illustration, transparent background; real labels are
+rendered separately in HTML.
+
+ai-1536.webp (1536 x 1024)
+Three small ivory standing itinerary cards displaying coral numerals 1, 2 and
+3, joined by a gently curving dotted coral route. Small coral map pins above
+the cards and a restrained gold sparkle suggest an intelligently planned trip.
+Transparent background, clearly readable simple numerals, balanced composition.
+
+budget-1536.webp (1536 x 1024)
+An ivory travel wallet or planner with coral edging and a small airplane emblem,
+a cream calculator with coral keys in front, a receipt and several short stacks
+of gold coins. Friendly miniature 3D still life, transparent background. Do not
+bake real prices or expense tables into the image.
+
+collaboration-1536.webp (1536 x 1024)
+Three friendly stylized adult travelers planning together: one holding a folded
+map, another engaged in discussion, and one pointing at a cream travel planning
+board with a small destination photo. Backpacks and coral/cream/navy clothing,
+expressive faces, coherent anatomy, transparent background. Keep member names
+and permission controls out of the illustration.
+
+ticket-1672.webp (1672 x 941)
+Two overlapping ivory boarding passes with coral airplane symbols, subtle
+perforated tear lines and restrained coral accents, viewed at a slight angle.
+Rounded tactile paper, soft realistic depth, transparent background, no real
+personal information, barcodes or airline logos.
+
+notebook-1672.webp (1672 x 941)
+An open cream travel notebook containing faint map sketches, with a coral
+pencil resting diagonally over a page, a coral ribbon bookmark and a small
+side clasp. Three-quarter view, soft paper texture, transparent background.
+
+camera-1672.webp (1672 x 941)
+A vintage ivory travel camera with a detailed dark glass lens and a loosely
+curved coral woven strap. Two small landscape photo prints rest beside it.
+Premium tactile materials, three-quarter view, transparent background.
+
+binoculars-1672.webp (1672 x 941)
+Coral-and-ivory binoculars with dark glass lenses, a subtle ivory strap and
+small angular cream mountain shapes beside them. Adventurous but refined
+miniature-object composition, transparent background.
+
+luggage-1536.webp (1536 x 1024)
+A cream duffel bag with coral handles, straps and trim, a cream passport with
+a small gold airplane emblem, and a rolled boarding pass with coral band.
+Elegant three-quarter still life with generous margins, transparent background.
+
+tag-1536.webp (1536 x 1024)
+An ivory luggage tag with a looped coral leather strap, subtle stitched edging,
+a small coral airplane mark and the exact handwritten inscription
+"Explore More Tomorrow" in dark navy. Slight diagonal three-quarter angle,
+transparent background. Verify spelling before publishing.
+
+3. 404 BACKGROUNDS — RECONSTRUCTED
+Existing assets: public/not-found/scene.webp and scene-night.webp (1440 x 720).
+These existing backgrounds remain static; replacing the traveler does not
+increase their native resolution. For a new 4K-width 2:1 background, request
+3840 x 1920 if the image model supports it, otherwise label upscaling accurately.
+
+DAY SCENE
+Create a wide 2:1 stylized 3D travel recovery-page scene matching the supplied
+reference. Enormous ivory "404" numerals on a warm cream ground, coral location
+pin above the last 4, ivory roller suitcase with coral trim near the center-left,
+a small directional signpost and miniature Mediterranean scenery at the sides.
+Warm diffused studio daylight, soft grounded shadows, generous clean space.
+Leave the traveler area empty in front of the zero, slightly right of center.
+No person, animated clouds, dotted route, airplane overlay, headline or buttons
+baked into this image; those are separate layers. Lock camera and composition.
+
+NIGHT SCENE
+Using the approved day scene as the exact composition reference, create its
+night version. Preserve camera, geometry, positions, scale, suitcase, numerals
+and signpost. Deep navy sky and ground, soft moonlight and cool rim lighting,
+a visible moon toward the upper left, subtle stars and warm windows in the
+small distant buildings. Keep coral accents recognizable. Leave the same
+traveler area empty. No character, moving clouds or page UI. Static background.
+
+4. TRAVELER REFERENCE IMAGES — RECONSTRUCTED
+Existing uploaded motion references: 67904.mp4 (day), 69819.mp4 (night).
+Both sources: 2160 x 3840, 24 fps, approximately 4.04 seconds.
+Use these exact references to maintain character identity; do not invent a new
+face or redesign the outfit. Retain full-body framing and the same ground line.
+
+DAY CHARACTER STILL
+Full-body stylized 3D young adult male traveler matching the reference: wavy
+brown hair, expressive brown eyes, ivory hooded top, olive cargo trousers,
+ivory sneakers with coral details, red backpack with rolled gear, holding a
+folded illustrated paper map in both hands. Mildly confused, looking down at
+the map. Soft warm lighting, centered fixed framing, entire shoes visible.
+Transparent background where supported; otherwise an even neutral gray
+background suitable for clean removal. Portrait 9:16, 2160 x 3840 output.
+
+NIGHT CHARACTER STILL
+The exact same traveler, outfit, map, size and position as the day reference.
+A lit headlamp rests on the forehead; warm light illuminates the face and map,
+with soft cool blue rim light on the outer silhouette. Preserve all features
+and full-body framing. Transparent background where supported, otherwise even
+neutral gray. Portrait 9:16, 2160 x 3840 output.
+
+5. ANIMATION DIRECTIONS — PRESERVED USER WORDING AND REUSABLE FORM
+Preserved user direction from the visible prior conversation:
+"first he looks into map, confuses. now he scrathes his head while looking into
+map. then looks both sides in consufion while holding both hands on map. and
+then looks into map like a loop. generate the same for both light and dark.
+in dark we use head light too."
+
+Reusable normalized motion prompt (not an original tool prompt):
+Animate only the reference traveler in a smooth four-second loop at 24 fps.
+Start looking down at the map, puzzled. Scratch the head while continuing to
+look at the map, then return that hand to the map. Holding the map in both
+hands, look to one side and then the other with confusion, then return to the
+initial map-reading pose. Match the ending pose to the beginning for a smooth
+loop. Keep both feet planted, body scale and screen position consistent, and
+camera completely locked: no zoom, pan, shake or reframing. Preserve face,
+hair, hands, map, backpack and clothes; avoid morphing or flicker. No walking,
+bouncing or movement of the environment. For night, preserve the headlamp and
+its warm face/map illumination. Use the corresponding day/night reference.
+
+Implementation constraint: keep the 404 artwork static. Animate clouds as a
+separate web layer. Composite only the transparent character video over the
+scene. Retain four-second pacing without discarding every other frame.
+
+6. EXACT CUTOUT PROMPTS USED IN THIS UPDATE
+Runway video background-removal subject, day:
+"the entire animated traveler, including his hair, clothes, shoes, backpack,
+hands, and paper map"
+
+Runway video background-removal subject, night:
+"the entire animated traveler, including his hair, headlamp, clothes, shoes,
+backpack, hands, and paper map"
+
+Processing note: the day result needed interior mask-hole repair to preserve
+the map and clothing. The night result was opaque, so it was not used as the
+final matte; connected gray-background removal produced the dark cutout.
+Original uploaded RGB video supplies the character colors in both outputs.
+Browser delivery uses transparent 4K VP9 WebM plus a lower-resolution packed
+RGB/alpha H.264 compatibility fallback. Do not use the uncorrected cutouts as
+final website assets. See scripts/README-traveler.md for the media workflow.
+
+7. FUTURE GENERATION RECORDS
+For each new asset, save the exact prompt and negative prompt, reference
+filenames, generator/model, date, task ID if applicable, actual output size,
+and post-processing steps. Do not store credentials or temporary signed URLs
+in this public repository. Code-built effects (such as the splash scene and
+cloud animation) are not image-generation prompts.

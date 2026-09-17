@@ -9,6 +9,7 @@ import '@fontsource/inter/latin-400.css';
 import '@fontsource/inter/latin-700.css';
 import '../LandingNext/landing-next.css';
 import './not-found.css';
+import TravelerVideo from './TravelerVideo';
 
 export default function NotFound({ unavailable = false }) {
   const { theme, toggleTheme, isLoggedIn } = useApp();
@@ -28,7 +29,7 @@ export default function NotFound({ unavailable = false }) {
     document.addEventListener('visibilitychange', visibility);
     return () => { document.title = previous; motion.removeEventListener('change', update); document.removeEventListener('visibilitychange', visibility); };
   }, [unavailable]);
-  // Fixed 48-frame CSS loop: O(1) state and memory, no frame-by-frame React renders.
+  // Native 24 fps video playback keeps animation out of React's render loop.
   const ai = () => isLoggedIn ? navigate('/', { state: { openAI: true } }) : setAuth(true);
   return <div className="ln-page nf-page" data-theme={theme}>
     <a className="ln-skip" href="#nf-main">Skip to content</a>
@@ -43,7 +44,7 @@ export default function NotFound({ unavailable = false }) {
         <img className="nf-backdrop" src={theme === 'dark' ? '/not-found/scene-night.webp' : '/not-found/scene.webp'} width="1440" height="720" alt="" fetchPriority="high" />
         <span className="nf-cloud nf-cloud-one" /><span className="nf-cloud nf-cloud-two" />
         <svg className="nf-route" viewBox="0 0 1000 150" fill="none" aria-hidden="true"><path d="M180 25C-30 35 20 140 220 105S470 45 690 105S915 105 940 67" stroke="currentColor" strokeWidth="2" strokeDasharray="7 8"/><g className="nf-paper-plane"><path d="M905 39 988 10 961 84 941 58Z" fill="currentColor"/><path d="m941 58 47-48-36 58-11-10Z" fill="#d64148"/><path d="m941 58 2 22 9-12" fill="#ef8585"/><path d="m914 40 29 12 35-33" stroke="#ffb3a8" strokeWidth="2"/></g></svg>
-        <div className="nf-traveler nf-traveler-48" aria-hidden="true" />
+        <TravelerVideo key={theme} theme={theme} paused={paused || hidden} reduced={reduced} />
       </div>
       <div className="nf-copy"><p className="nf-code">{unavailable ? 'Page unavailable' : '404 · Page not found'}</p><h1>Looks like we took a wrong turn.</h1><p>{unavailable ? 'We couldn’t load this page. Please try again in a moment.' : 'This page is off the map. Let’s get you back on track.'}</p>
         <Link className="ln-primary nf-home" to="/"><span className="nf-home-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m10 5-7 7 7 7M3 12h18" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/></svg></span>Back to home</Link>

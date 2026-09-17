@@ -5,17 +5,11 @@
 .nf-scene { position:relative;aspect-ratio:2;isolation:isolate;overflow:hidden;border-radius:16px;background:#fffaf5; }
 .nf-backdrop { width:100%;height:100%;display:block; }
 .nf-traveler { position:absolute;width:22.5%;height:90%;left:43%;bottom:8%; }
-.nf-pose { clip-path:inset(0 3%);position:absolute;inset:0;background-image:url('/not-found/traveler.webp');background-size:400% 100%;opacity:0;animation:nf-pose 4s linear infinite; }
-.nf-pose-0 { background-position:0% 0;animation-delay:-.1s; }
-.nf-pose-1 { background-position:33.333% 0;animation-delay:-3.1s; }
-.nf-pose-2 { background-position:66.666% 0;animation-delay:-2.1s; }
-.nf-pose-3 { background-position:100% 0;animation-delay:-1.1s; }
 .nf-cloud { position:absolute;width:12%;height:5%;top:21%;left:8%;background:#f2e6db;border-radius:60px;filter:blur(1px);opacity:.75;animation:nf-cloud 16s ease-in-out infinite alternate; }
 .nf-cloud::before,.nf-cloud::after { content:'';position:absolute;background:inherit;border-radius:50%;width:42%;height:190%;left:15%;bottom:0; }
 .nf-cloud::after { width:34%;height:150%;left:50%; }
 .nf-cloud-two { left:80%;top:28%;width:10%;animation-delay:-8s; }
 .nf-route { position:absolute;bottom:6%;left:0;width:100%;height:20%;color:#f05c5c; }
-.nf-route path:first-child { animation:nf-route 12s linear infinite; }
 .nf-copy { text-align:center;padding:0 24px;position:relative; }
 .nf-page .nf-copy h1 { font-size:clamp(29px,3.5vw,48px); }
 .nf-page .nf-code { margin:0 0 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ln-accent); }
@@ -28,9 +22,6 @@
 
 .nf-scene[data-paused=true] * { animation-play-state:paused!important; }
 @keyframes nf-cloud { from{transform:translateX(-20%)}to{transform:translateX(30%)} }
-@keyframes nf-route { to{stroke-dashoffset:-180} }
-@keyframes nf-pose { 0%,23%{opacity:1}25%,98%{opacity:0}100%{opacity:1} }
-@media(prefers-reduced-motion:reduce){.nf-scene *{animation:none!important}.nf-pose{opacity:0}.nf-pose-0{opacity:1}}
 @media(max-width:760px){
  .nf-header{flex-wrap:wrap}.nf-header .nf-ai{font-size:12px;padding:8px;margin-left:auto}.nf-header .ln-brand{font-size:18px}
  .nf-scene{margin:24px 0;aspect-ratio:2}.nf-backdrop{position:static;width:100%;height:100%;object-fit:contain}
@@ -69,66 +60,15 @@
 /* One 2:1 coordinate space keeps the entire composition visible at every width. */
 .nf-page[data-theme=dark] .nf-scene { background:#161d2a; }
 .nf-page[data-theme=dark] .nf-cloud { background:#6f84a3;opacity:.22; }
-.nf-page[data-theme=dark] .nf-pose { filter:brightness(.72) saturate(.8); }
-.nf-torch { position:absolute;inset:0;width:100%;height:100%;overflow:visible; }
-.nf-beam { fill:#fff0ac;opacity:.17;filter:blur(6px);mix-blend-mode:screen; }
-.nf-lamp { filter:drop-shadow(0 0 9px #fff3bc); }
-
-/* 48 generated cells / 2 seconds = 24 fps, O(1) DOM and no React frame updates. */
-.nf-traveler-48 { width:36%;height:72%;left:37%;bottom:10%;background:url(/not-found/traveler-48-light.webp) 0 0/800% 600%;animation:nf-frames-48 4s steps(1,end) infinite; }
-.nf-page[data-theme=dark] .nf-traveler-48 {background-image:url(/not-found/traveler-48-dark.webp);}
-@keyframes nf-frames-48 {
-0.000000% {background-position:0.000000% 0.000000%;}
-2.083333% {background-position:14.285714% 0.000000%;}
-4.166667% {background-position:28.571429% 0.000000%;}
-6.250000% {background-position:42.857143% 0.000000%;}
-8.333333% {background-position:57.142857% 0.000000%;}
-10.416667% {background-position:71.428571% 0.000000%;}
-12.500000% {background-position:85.714286% 0.000000%;}
-14.583333% {background-position:100.000000% 0.000000%;}
-16.666667% {background-position:0.000000% 20.000000%;}
-18.750000% {background-position:14.285714% 20.000000%;}
-20.833333% {background-position:28.571429% 20.000000%;}
-22.916667% {background-position:42.857143% 20.000000%;}
-25.000000% {background-position:57.142857% 20.000000%;}
-27.083333% {background-position:71.428571% 20.000000%;}
-29.166667% {background-position:85.714286% 20.000000%;}
-31.250000% {background-position:100.000000% 20.000000%;}
-33.333333% {background-position:0.000000% 40.000000%;}
-35.416667% {background-position:14.285714% 40.000000%;}
-37.500000% {background-position:28.571429% 40.000000%;}
-39.583333% {background-position:42.857143% 40.000000%;}
-41.666667% {background-position:57.142857% 40.000000%;}
-43.750000% {background-position:71.428571% 40.000000%;}
-45.833333% {background-position:85.714286% 40.000000%;}
-47.916667% {background-position:100.000000% 40.000000%;}
-50.000000% {background-position:0.000000% 60.000000%;}
-52.083333% {background-position:14.285714% 60.000000%;}
-54.166667% {background-position:28.571429% 60.000000%;}
-56.250000% {background-position:42.857143% 60.000000%;}
-58.333333% {background-position:57.142857% 60.000000%;}
-60.416667% {background-position:71.428571% 60.000000%;}
-62.500000% {background-position:85.714286% 60.000000%;}
-64.583333% {background-position:100.000000% 60.000000%;}
-66.666667% {background-position:0.000000% 80.000000%;}
-68.750000% {background-position:14.285714% 80.000000%;}
-70.833333% {background-position:28.571429% 80.000000%;}
-72.916667% {background-position:42.857143% 80.000000%;}
-75.000000% {background-position:57.142857% 80.000000%;}
-77.083333% {background-position:71.428571% 80.000000%;}
-79.166667% {background-position:85.714286% 80.000000%;}
-81.250000% {background-position:100.000000% 80.000000%;}
-83.333333% {background-position:0.000000% 100.000000%;}
-85.416667% {background-position:14.285714% 100.000000%;}
-87.500000% {background-position:28.571429% 100.000000%;}
-89.583333% {background-position:42.857143% 100.000000%;}
-91.666667% {background-position:57.142857% 100.000000%;}
-93.750000% {background-position:71.428571% 100.000000%;}
-95.833333% {background-position:85.714286% 100.000000%;}
-97.916667% {background-position:100.000000% 100.000000%;}
-100%{background-position:0 0;}
-}
-@media(prefers-reduced-motion:reduce){.nf-traveler-48{animation:none!important;background-position:0 0;}}
 
 /* Keep the artwork near its native detail while preserving the complete scene. */
 .nf-page .nf-scene { max-width:1200px;margin-left:auto;margin-right:auto; }
+
+/* One fixed 9:16 frame; its feet stay on the same baseline in both themes. */
+.nf-scene .nf-traveler { width:25.3125%;height:90%;left:42.34375%;bottom:4%; }
+.nf-traveler-video,.nf-traveler-canvas { position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;pointer-events:none; }
+@media(prefers-reduced-motion:reduce){.nf-scene *{animation:none!important}}
+
+/* Reuse the existing first sprite cell only if video decoding fails. */
+.nf-traveler-still { position:absolute;left:-38.8889%;top:0;width:177.7778%;height:100%;background:url('/not-found/traveler-48-light.webp') 0 0 / 800% 600%; }
+.nf-page[data-theme=dark] .nf-traveler-still { background-image:url('/not-found/traveler-48-dark.webp'); }
