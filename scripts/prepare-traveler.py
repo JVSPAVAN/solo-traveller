@@ -16,10 +16,6 @@ def prepare(source, theme):
     primary = subprocess.Popen(['ffmpeg','-y','-v','error','-f','rawvideo','-pixel_format','bgra','-video_size',f'{width}x{height}','-framerate','24','-i','-','-an','-c:v','libvpx-vp9','-pix_fmt','yuva420p','-b:v','0','-crf','24','-deadline','realtime','-cpu-used','6','-row-mt','1','-threads','4',str(target / f'traveler-{theme}-4k.webm')],stdin=subprocess.PIPE)
     portable = subprocess.Popen(['ffmpeg','-y','-v','error','-f','rawvideo','-pixel_format','bgr24','-video_size','2160x1920','-framerate','24','-i','-','-an','-c:v','libx264','-preset','fast','-crf','20','-pix_fmt','yuv420p','-movflags','+faststart',str(target / f'traveler-{theme}-packed.mp4')],stdin=subprocess.PIPE)
     cv2.setNumThreads(2)
-    # Optional Runway segmentation is a matte only; original RGB preserves all detail.
-    segmentation = None
-    if theme == 'light' and len(sys.argv) > 3:
-        segmentation = subprocess.Popen(['ffmpeg','-v','error','-c:v','libvpx-vp9','-i',sys.argv[3],'-vf','alphaextract,scale=1080:1920','-frames:v','96','-f','rawvideo','-pix_fmt','gray','-'],stdout=subprocess.PIPE)
     count = 0
     while count < 96:
         ok, frame = capture.read()
@@ -36,14 +32,9 @@ def prepare(source, theme):
         # Remove disconnected compression specks, preserving the main silhouette.
         _, foreground, sizes, _ = cv2.connectedComponentsWithStats(matte)
         matte = (foreground == (1 + np.argmax(sizes[1:,cv2.CC_STAT_AREA]))).astype(np.uint8)*255
-        if segmentation:
-            data = segmentation.stdout.read(1080*1920)
-            assert len(data) == 1080*1920
-            segmented = np.frombuffer(data,np.uint8).reshape(1920,1080)
-            # Fill erroneous holes in the map and clothing without changing source colors.
-            contours, _ = cv2.findContours((segmented > 127).astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            matte = np.zeros_like(segmented)
-            cv2.drawContours(matte,[max(contours,key=cv2.contourArea)],-1,255,cv2.FILLED)
+        # Use the source-derived matte for both themes. The generated light cutout
+        # omits the map and hand along an open edge; filling interior holes in that
+        # cutout cannot restore them. Never replace this matte with that cutout.
         alpha = cv2.resize(matte,(width,height),interpolation=cv2.INTER_LINEAR)
         alpha = cv2.GaussianBlur(alpha,(3,3),0)
         rgba = cv2.cvtColor(frame,cv2.COLOR_BGR2BGRA)
@@ -58,9 +49,6 @@ def prepare(source, theme):
             cv2.imwrite(f'/tmp/traveler-{theme}-{count}.jpg',composite)
         count += 1
     capture.release()
-    if segmentation:
-        segmentation.stdout.close()
-        segmentation.wait()
     primary.stdin.close()
     portable.stdin.close()
     assert primary.wait() == 0 and portable.wait() == 0
@@ -69,5 +57,7 @@ def prepare(source, theme):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) != 3:
+        sys.exit('Usage: python scripts/prepare-traveler.py LIGHT.mp4 DARK.mp4')
     for source, theme in zip(sys.argv[1:3], ['light','dark']):
         prepare(source,theme)

@@ -13,9 +13,11 @@ Replaces the 48-cell sprite sheet with the supplied Runway character motion.
 To regenerate with Python, NumPy, OpenCV and FFmpeg installed:
 
 ```sh
-python scripts/prepare-traveler.py /path/to/67904.mp4 /path/to/69819.mp4 /path/to/light-runway-cutout.webm
+python scripts/prepare-traveler.py /path/to/67904.mp4 /path/to/69819.mp4
 ```
 
-The optional fourth argument is Runway's light-theme segmentation. Its exterior contour supplies the matte, with interior holes repaired; color always comes from the original uploaded clip. The dark clip uses connected gray-background removal because Runway returned an opaque dark cutout. No additional generated motion is introduced.
+Both themes use connected gray-background removal from the original uploaded clips. Color always comes from those clips. Do not use the generated light cutout as a matte: it excludes the map and hand along an open edge, which contour hole-filling cannot repair. No additional generated motion is introduced.
+
+Run `python scripts/check-traveler.py` after regeneration. It decodes all 96 frames of both delivery formats in both themes, checking that the map stays opaque and the backdrop stays transparent. This catches the missing-map regression in the actual encoded assets, including the MP4 fallback.
 
 Build with `npm ci && npm run build`. Browser QA should cover both themes, the four-second repeat boundary, pause/resume, reduced motion, and the MP4 fallback on browsers without transparent WebM playback.
